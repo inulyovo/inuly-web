@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pokers</title>
+    <style>
+        @font-face {
+            font-family: "myfont";
+            src: url("https://www.leleo.top/fonts/faken.ttf");
+            font-display: swap;
+        }
+
+        div {
+            user-select: none;
+        }
+
+        * {
+            font-size: 2vmin;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background-color: #e4e9f5;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* HOROSCOPE 背景文字樣式 - 往上移動 */
+        .horoscope-bg {
+            position: absolute;
+            top: 0%; /* 從 50% 改為 35%，往上移 */
+            left: 50%;
+            transform: translateX(-50%); /* 只水平居中，垂直由 top 控制 */
+            font-family: "myfont", serif;
+            font-size: 18vmin;
+            font-weight: bold;
+            color: rgba(100, 120, 180, 0.15);
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+            z-index: 1;
+            pointer-events: none;
+            user-select: none;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            position: absolute;
+            width: 45rem;
+            height: 25rem;
+            margin-top: 8rem; /* 新增：整體容器往下移 */
+            z-index: 10;
+        }
+
+        .poker,
+        .poker_top {
+            position: absolute;
+            width: 20rem;
+            height: 26rem;
+            border: 0.15rem solid rgba(255, 255, 255, 0.4);
+            border-radius: 1.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transform-origin: bottom left;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .poker:hover,
+        .poker_top:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .poker:not(.top-card):hover {
+            transform: var(--original-transform) translateY(-40px) !important;
+            z-index: 999 !important;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .poker img {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.95;
+        }
+
+        .poker_top {
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .arrow-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .arrow {
+            position: absolute;
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            animation: slideArrow 3s infinite linear;
+            z-index: 1001;
+        }
+
+        @keyframes slideArrow {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(150%); }
+        }
+
+        .click-effect {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: clickRipple 0.5s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes clickRipple {
+            to {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+
+        .poker1 { transform: rotate(-10deg); }
+        .poker2 { transform: rotate(-6deg) translate(35%, -12%); }
+        .poker3 { transform: rotate(-2deg) translate(65%, -19%); }
+        .poker4 { transform: rotate(2deg) translate(95%, -26%); }
+        .poker5 { transform: rotate(6deg) translate(125%, -23%); }
+
+        @supports not ((-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))) {
+            .poker,
+            .poker_top {
+                background: rgba(30, 30, 30, 0.7);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HOROSCOPE 背景文字：往上移動 -->
+    <div class="horoscope-bg">HOROSCOPE</div>
+
+    <div class="container">
+        <div class="poker poker1" onclick="top.location.href='./3d/3d-carousel.html'">
+            <img src="./3d/img-2/05.jpg" />
+        </div>
+        <div class="poker poker2" onclick="top.location.href='./3d/3d-carousel.html'">
+            <img src="./3d/img-2/04.jpg" />
+        </div>
+        <div class="poker poker3" onclick="top.location.href='./3d/3d-carousel.html'">
+            <img src="./3d/img-2/03.jpg" />
+        </div>
+        <div class="poker poker4" onclick="top.location.href='./3d/3d-carousel.html'">
+            <img src="./3d/img-2/02.jpg" />
+        </div>
+        <div class="poker poker5 top-card" onclick="top.location.href='./3d/3d-carousel.html'">
+            <img src="./3d/img-2/01.jpg" />
+        </div>
+        <div class="poker_top poker5" onclick="event.stopPropagation(); poker.move(); playClickEffect(event)">
+            <div class="arrow-container">
+                <div class="arrow">→</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const poker = {
+            imgs: [],
+            img_index: 0,
+            poker_eles: [],
+            transform_datas: [
+                "rotate(-10deg)",
+                "rotate(-6deg) translate(35%, -12%)",
+                "rotate(-2deg) translate(65%, -19%)",
+                "rotate(2deg) translate(95%, -26%)",
+                "rotate(6deg) translate(125%, -23%)",
+            ],
+            init() {
+                for (let i = 1; i <= 22; i++) {
+                    let img = new Image();
+                    const filename = String(i).padStart(2, '0');
+                    img.src = `./3d/img-2/${filename}.jpg`;
+                    this.imgs.push(img);
+                }
+                this.poker_eles = [...document.querySelectorAll(".poker")];
+                this.poker_eles.forEach((obj, index) => {
+                    obj.nums = index;
+                    obj.style.setProperty('--original-transform', this.transform_datas[index]);
+                });
+                this.img_index = this.poker_eles.length;
+            },
+            move() {
+                document.querySelectorAll('.poker').forEach(card => {
+                    card.classList.remove('top-card');
+                });
+                
+                this.poker_eles.forEach((ele) => {
+                    let nums = ele.nums + 1;
+                    if (nums >= this.poker_eles.length) {
+                        nums = 0;
+                        ele.querySelector("img").src = this.imgs[this.img_index].src;
+                        this.img_index = (this.img_index + 1) % this.imgs.length;
+                        ele.style.transition = "none";
+                    } else {
+                        ele.style.transition = "transform 0.3s ease";
+                    }
+                    ele.nums = nums;
+                    ele.style.zIndex = nums;
+                    ele.style.transform = this.transform_datas[nums];
+                    ele.style.setProperty('--original-transform', this.transform_datas[nums]);
+                });
+                
+                const rightmostCard = this.poker_eles.find(card => card.nums === this.poker_eles.length - 1);
+                if (rightmostCard) {
+                    rightmostCard.classList.add('top-card');
+                }
+                
+                setTimeout(() => {
+                    const leftmostCard = this.poker_eles.find(card => card.nums === 0);
+                    if (leftmostCard) {
+                        leftmostCard.style.transition = "transform 0.3s ease";
+                    }
+                }, 300);
+            },
+        };
+
+        function playClickEffect(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'click-effect';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.parentNode.removeChild(ripple);
+                }
+            }, 500);
+        }
+
+        poker.init();
+    </script>
+
+</body>
+</html>

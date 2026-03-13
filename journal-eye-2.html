@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@600&display=swap"
+        rel="stylesheet">
+
+    <title>IFRAME 運作邏輯說明</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            background-color: #0a0a0aee;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .eye-container {
+            position: absolute;
+            z-index: 10;
+            padding: 0;
+        }
+
+        .eye-container.top {
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: grid;
+            grid-template-columns: repeat(24, 50px);
+            grid-template-rows: repeat(1, 50px);
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .eye-container.bottom {
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: grid;
+            grid-template-columns: repeat(24, 50px);
+            grid-template-rows: repeat(1, 50px);
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .eye-container.left {
+            top: 0;
+            left: 20px;
+            height: 100%;
+            width: 50px;
+            display: grid;
+            grid-template-columns: repeat(1, 50px);
+            grid-template-rows: repeat(16, 50px);
+            gap: 8px;
+            align-content: center;
+        }
+
+        .eye-container.right {
+            top: 0;
+            right: 20px;
+            height: 100%;
+            width: 50px;
+            display: grid;
+            grid-template-columns: repeat(1, 50px);
+            grid-template-rows: repeat(16, 50px);
+            gap: 8px;
+            align-content: center;
+        }
+
+        .eye {
+            width: 50px;
+            height: 50px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.2s ease-out;
+            position: relative;
+        }
+
+        .pupil {
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.2s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas></canvas>
+
+    <div class="eye-container top"></div>
+    <div class="eye-container bottom"></div>
+    <div class="eye-container left"></div>
+    <div class="eye-container right"></div>
+
+    <script>
+        // ==================== 創建眼睛 ====================
+        const eyeContainers = document.querySelectorAll('.eye-container');
+        eyeContainers.forEach(container => {
+            let count;
+            if (container.classList.contains('top') || container.classList.contains('bottom')) {
+                count = 24;
+            } else if (container.classList.contains('left') || container.classList.contains('right')) {
+                count = 16;
+            }
+
+            for (let i = 0; i < count; i++) {
+                createEye(container);
+            }
+        });
+
+        function createEye(container) {
+            const eye = document.createElement('div');
+            const pupil = document.createElement('div');
+            eye.className = 'eye';
+            pupil.className = 'pupil';
+            eye.appendChild(pupil);
+            container.appendChild(eye);
+        }
+
+        // ==================== 眼睛瞳孔追隨效果 ====================
+        const allEyes = document.querySelectorAll('.eye');
+
+        document.body.addEventListener('mousemove', (e) => {
+            allEyes.forEach((eye) => {
+                const pupil = eye.querySelector('.pupil');
+                const eyeRect = eye.getBoundingClientRect();
+                const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+                const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+                const dx = (e.clientX - eyeCenterX) / eyeRect.width;
+                const dy = (e.clientY - eyeCenterY) / eyeRect.height;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = 0.9;
+                const clampedDistance = Math.min(distance, maxDistance);
+
+                const angle = Math.atan2(dy, dx);
+                const pupilX = Math.cos(angle) * clampedDistance * (eyeRect.width / 2 - pupil.offsetWidth / 2);
+                const pupilY = Math.sin(angle) * clampedDistance * (eyeRect.height / 2 - pupil.offsetHeight / 2);
+
+                pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+
+                const shadowOffsetX = pupilX / 4;
+                const shadowOffsetY = pupilY / 2;
+                const shadowBlur = 8;
+                eye.style.boxShadow = `inset ${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, 0.5)`;
+            });
+        });
+
+        document.body.addEventListener('mouseleave', () => {
+            allEyes.forEach((eye) => {
+                const pupil = eye.querySelector('.pupil');
+                pupil.style.transform = 'translate(0, 0)';
+                eye.style.boxShadow = 'inset 0px 0px 8px rgba(0, 0, 0, 0.5)';
+            });
+        });
+
+        // ==================== 內容與設定 ====================
+        // 外層文字：開發者筆記風格
+        const CONTENT = `【架構說明】
+本頁面採用雙層渲染架構：外層為 DOM 元素構成的眼睛邊框，內層為 Canvas 文字動畫系統。 
+眼睛追蹤透過 getBoundingClientRect 計算座標，瞳孔位移使用三角函數與距離限制。  
+【文字動畫邏輯】
+每個字元獨立計算與滑鼠的距離，450px 內產生排斥效果，超出則自動歸位。
+背景於字元位移超過閾值時浮現，形成表裡雙重敘事。
+【設計靈感】
+底層文字意象取自魯迅《狂人日記》——從字縫中看出隱藏的真相。
+內層內容範圍受外層邊框約束，象徵框架之內的自我表述。`;
+
+        // 內層背景文字：哲學隱喻風格（當外層文字被推開時浮現）
+        const BG_CONTENT = `
+外層是結構，內層是表述。
+眼睛定義邊界，文字在邊界內流動。
+眼睛凝視著中央，如同社會的注視。
+文字試圖逃離原位，終究被拉回既定軌道。
+                            
+白色文字是當下的表述，紅色是歷史的迴聲。
+
+當表層被擾動，底層的真相才會浮現。
+
+內層的自述永遠無法超越外層的框架，
+這既是技術的約束，也是隱喻的本質。
+                            
+`;
+
+        const FONT_SIZE = 35;
+        const BG_FONT_SIZE = 35;
+        const SHOW_DISTANCE_THRESHOLD = 30;
+
+        // ==================== Char 類 ====================
+        class Char {
+            constructor(originX, originY, char, bgChar, canvasWidth, canvasHeight) {
+                this.originX = originX;
+                this.originY = originY;
+                this.x = originX;  // 初始位置就在 origin
+                this.y = originY;
+                this.char = char;
+                this.bgChar = bgChar;
+                this.size = FONT_SIZE;
+                this.bgSize = BG_FONT_SIZE;
+                this.distanceFromOrigin = 0;
+            }
+
+            moved(vx, vy) {
+                this.x += vx;
+                this.y += vy;
+                const dx = this.x - this.originX;
+                const dy = this.y - this.originY;
+                this.distanceFromOrigin = Math.sqrt(dx * dx + dy * dy);
+            }
+
+            moveTo(x, y, curve = "linear") {
+                const dx = x - this.x;
+                const dy = y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                let force = 1;
+
+                switch (curve) {
+                    case "easeIn":
+                        force = Math.min(distance / 25, 10);
+                        break;
+                    case "RevEaseIn":
+                        force = -Math.min(distance / 120, 6);
+                        break;
+                    case "linear":
+                        force = 5;
+                        break;
+                }
+
+                const angle = Math.atan2(dy, dx);
+                const vx = Math.cos(angle) * force;
+                const vy = Math.sin(angle) * force;
+                this.moved(vx, vy);
+            }
+
+            shouldShowBg() {
+                return this.distanceFromOrigin > SHOW_DISTANCE_THRESHOLD;
+            }
+        }
+
+        // ==================== CanvasText 類 ====================
+        class CanvasText {
+            constructor(element) {
+                if (!element || element.nodeName !== 'CANVAS') {
+                    throw new Error(`canvas element is required`);
+                }
+                this.canvas = element;
+                this.ctx = this.canvas.getContext('2d');
+                this.ratio = window.devicePixelRatio || 1;
+                this.resize();
+                this.#init();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth * this.ratio;
+                this.canvas.height = window.innerHeight * this.ratio;
+                this.cWidth = this.canvas.width;
+                this.cHeight = this.canvas.height;
+            }
+
+            #init() {
+                this.string = CONTENT;
+                this.bgString = BG_CONTENT;
+                this.charWidth = FONT_SIZE * this.ratio + 2;
+                this.#initTextPos();
+                this.mouseX = -1000;
+                this.mouseY = -1000;
+
+                this.canvas.addEventListener('mousemove', (e) => {
+                    this.mouseX = e.clientX * this.ratio;
+                    this.mouseY = e.clientY * this.ratio;
+                });
+
+                this.canvas.addEventListener('mouseleave', () => {
+                    this.mouseX = -1000;
+                    this.mouseY = -1000;
+                });
+
+                this.#loop();
+            }
+
+            #initTextPos() {
+                const config = {
+                    marginLeft: 150,
+                    marginRight: 150,
+                    marginTop: 100,
+                    marginBottom: 100,
+                    lineHeight: 61 * this.ratio,
+                };
+
+                const textWidth = this.cWidth - config.marginLeft - config.marginRight;
+                const maxCols = Math.floor(textWidth / this.charWidth);
+                let rowsCount = 0;
+                let colsCount = 0;
+                let charIndex = 0;
+                this.charArr = [];
+
+                // 將背景文字按行拆分，過濾掉純空格行但保留空行結構
+                const bgLines = BG_CONTENT.split('\n');
+                let bgCurrentLine = 0;
+                let bgCurrentCol = 0;
+
+                for (let i = 0; i < this.string.length; i++) {
+                    const char = this.string[i];
+
+                    if (char === '\n') {
+                        rowsCount++;
+                        colsCount = 0;
+                        bgCurrentCol = 0;
+                        // 外層換行時，背景文字也換到下一行（循環）
+                        bgCurrentLine = (bgCurrentLine + 1) % bgLines.length;
+                        continue;
+                    }
+
+                    if (colsCount >= maxCols) {
+                        rowsCount++;
+                        colsCount = 0;
+                        bgCurrentCol = 0;
+                        // 自動換行時，背景文字也換到下一行（循環）
+                        bgCurrentLine = (bgCurrentLine + 1) % bgLines.length;
+                    }
+
+                    const x = config.marginLeft + colsCount * this.charWidth;
+                    const y = config.marginTop + rowsCount * config.lineHeight;
+
+                    // 獲取當前背景行的字符
+                    let bgChar = '';
+                    if (bgLines.length > 0) {
+                        const currentBgLine = bgLines[bgCurrentLine];
+                        if (currentBgLine && bgCurrentCol < currentBgLine.length) {
+                            bgChar = currentBgLine[bgCurrentCol];
+                        }
+                    }
+
+                    this.charArr.push(new Char(x, y, char, bgChar, this.cWidth, this.cHeight));
+
+                    colsCount++;
+                    charIndex++;
+                    bgCurrentCol++;
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.cWidth, this.cHeight);
+
+                // 先繪製背景文字（紅色，哲學隱喻）
+                this.ctx.font = `bold ${BG_FONT_SIZE * this.ratio}px "Microsoft JhengHei", "微軟正黑體", sans-serif`;
+
+                for (const char of this.charArr) {
+                    // 只繪製非空字符
+                    if (char.bgChar && char.bgChar !== ' ' && char.shouldShowBg()) {
+                        this.ctx.fillStyle = '#CC000088';
+                        this.ctx.fillText(char.bgChar, char.originX, char.originY + BG_FONT_SIZE * this.ratio * 0.8);
+                    }
+                }
+
+
+                this.ctx.font = `${FONT_SIZE * this.ratio}px "Microsoft JhengHei", "微軟正黑體", sans-serif`;
+
+                for (const char of this.charArr) {
+                    const dx = this.mouseX - char.x;
+                    const dy = this.mouseY - char.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 450) {
+                        char.moveTo(this.mouseX, this.mouseY, "RevEaseIn");
+                    } else {
+                        char.moveTo(char.originX, char.originY, "easeIn");
+                    }
+
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.fillText(char.char, char.x, char.y + FONT_SIZE * this.ratio * 0.8);
+                }
+            }
+
+            #loop() {
+                this.draw();
+                requestAnimationFrame(() => this.#loop());
+            }
+
+            reinit() {
+                this.resize();
+                this.#initTextPos();
+            }
+        }
+
+        // ==================== 視窗調整處理 ====================
+        let canvasText;
+        window.addEventListener('resize', () => {
+            if (canvasText) {
+                canvasText.reinit();
+            }
+        });
+
+        // ==================== 啟動程式 ====================
+        window.addEventListener('load', () => {
+            const canvas = document.querySelector('canvas');
+            canvasText = new CanvasText(canvas);
+        });
+    </script>
+</body>
+
+</html>

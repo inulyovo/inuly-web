@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D輪播效果</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="./gsap.js"></script>
+    
+    <style>
+        .page-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e4e9f5;
+            z-index: 99999;
+            pointer-events: none;
+            border-bottom-right-radius: 100px;
+            border-top-right-radius: 100px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-right-color: #0a0a0a;
+        }
+
+        .vertical-transition-overlay {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+    </style>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: "Source Sans Pro", sans-serif;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #111;
+            background-size: cover;
+            background-position: center 35%;
+            /* 👈 關鍵 */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow: hidden;
+            transition: background-image .7s ease-in-out;
+        }
+
+        .shell {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(99, 99, 99, 0.8);
+        }
+
+        .button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 350px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 150px;
+            z-index: 100;
+        }
+
+        .prev,
+        .next {
+            transition: transform 0.25s ease;
+            bottom: 5px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .prev i,
+        .next i {
+            font-size: 60px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .shell_body {
+            width: 100%;
+            padding: 20px 0 150px 0;
+        }
+
+        .shell_slider {
+            position: relative;
+            transition: transform 1s ease-in-out;
+            background: transparent;
+            height: 100%;
+        }
+
+        .item {
+            position: relative;
+            float: left;
+            margin: 0 20px;
+        }
+
+        .frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 1s ease-in-out;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .frame:after {
+            content: "";
+            position: absolute;
+            bottom: -16%;
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.1);
+            transform: rotateX(90deg) translate3d(0px, -20px, 0px);
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            /* 👈 讓內容從頂部開始排列 */
+            align-items: center;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid #fff;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            padding-top: 20px;
+            /* 可選：避免貼到邊緣 */
+        }
+
+        .box h1,
+        .box span {
+            color: #fff;
+            transform: translateZ(20px);
+        }
+
+        .box h1 {
+            text-shadow: 0 0 30px #4d5bff;
+            font-size: 100px;
+            transform: translateZ(20px);
+            margin: 0;
+            /* 清除預設 margin，避免偏移 */
+        }
+
+        .box span {
+            position: absolute;
+            bottom: 20px;
+            padding: 0 25px;
+            text-shadow: 0 0 10px #1f05b4;
+        }
+
+        .front,
+        .left,
+        .right {
+            box-shadow: 0 0 50px #ffffff;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .right,
+        .left {
+            top: 0;
+            width: 60px;
+            backface-visibility: hidden;
+        }
+
+        .left {
+            left: 0;
+            border-left: 5px solid #fff;
+            transform: translate3d(1px, 0, -60px) rotateY(-90deg);
+            transform-origin: 0%;
+        }
+
+        .right {
+            right: 0;
+            border-right: 5px solid #fff;
+            transform: translate3d(-1px, 0, -60px) rotateY(90deg);
+            transform-origin: 100%;
+        }
+
+        /* 燈箱自訂樣式 */
+        #lightboxOverlay {
+            background-color: rgba(0, 0, 0, 0.95) !important;
+            z-index: 9999 !important;
+        }
+
+        #lightbox {
+            top: 50% !important;
+            transform: translateY(-60%) !important;
+            padding-top: 0 !important;
+        }
+
+        .lb-dataContainer {
+            background-color: rgba(30, 30, 30, 0.9) !important;
+            border-radius: 8px !important;
+            padding: 15px !important;
+        }
+
+        .lb-details {
+            color: #fff !important;
+        }
+
+        .lb-caption {
+            font-size: 20px !important;
+            line-height: 1.4 !important;
+        }
+
+        .lb-number {
+            color: #4a90e2 !important;
+        }
+
+        .lb-close {
+            color: #ff4d4d !important;
+        }
+
+        .lb-prev {
+            background: rgba(60, 60, 60, 0.4) !important;
+            border-radius: 10px;
+            top: 0px;
+            width: 100px !important;
+            height: 570px !important;
+
+        }
+
+        .lb-next {
+            background: rgba(60, 60, 60, 0.4) !important;
+            border-radius: 10px;
+            top: 0px;
+            width: 100px !important;
+            height: 570px !important;
+        }
+
+        /* 圖片加載失敗提示 */
+        .image-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff4d4d;
+            font-size: 18px;
+            text-align: center;
+            z-index: 10;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        @media (max-width: 768px) {
+            .lb-image {
+                max-width: 95% !important;
+                max-height: 90% !important;
+            }
+
+            #lightbox {
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="./3d-carousel.css">
+    <link rel="stylesheet" href="../css/hbnav.css">
+
+</head>
+
+
+<body>
+    <div class="shell">
+        <div class="shell_body">
+            <div class="button">
+                <div class="prev"><i class="fas fa-chevron-left"></i></div>
+                <div class="next"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="shell_slider">
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>O</h1>
+                            <span>The Fool</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>I</h1>
+                            <span>The Magician</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>II</h1>
+                            <span>The High Priestess</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>III</h1>
+                            <span>The Empress</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>IV</h1>
+                            <span>The Emperor</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>V</h1>
+                            <span>The Hierophant</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>VI</h1>
+                            <span>The Lovers</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>VII</h1>
+                            <span>The Chariot</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>VIII</h1>
+                            <span>Justice</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>IX</h1>
+                            <span>The Hermit</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>X</h1>
+                            <span>Wheel of Fortune</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XI</h1>
+                            <span>Strength</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XII</h1>
+                            <span>The Hanged Man</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XIII</h1>
+                            <span>Death</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XIV</h1>
+                            <span>Temperance</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XV</h1>
+                            <span>The Devil</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XVI</h1>
+                            <span>The Tower</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XVII</h1>
+                            <span>The Star</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XVIII</h1>
+                            <span>The Moon</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XIX</h1>
+                            <span>The Sun</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XX</h1>
+                            <span>Judgement</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>XXI</h1>
+                            <span>The World</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <nav class="hbnav-nav" id="hbnav-nav">
+        <a href="../test3.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Home</span>
+        </a>
+
+        <a href="./3d-carousel.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Horoscope</span>
+        </a>
+
+        <a href="../in-2-scroll.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 2h18v20H3zm2 2v16h14V4zm2 2h10v12H7z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Gallery</span>
+        </a>
+        <a href="../messenger.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">News</span>
+        </a>
+
+        <a href="../me.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Me</span>
+        </a>
+
+        <a href="../_login.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <!-- 向左的三角形，且放大 -->
+                    <path d="M16 12 L6 4 L6 20 Z" />
+                    <!-- 放大的括號 -->
+                    <path d="M19 8 V20 H22 V4 H19" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Logout</span>
+        </a>
+
+        <!-- 重要：只保留一個 overlay 且放在最後 -->
+        <div class="hbnav-overlay"></div>
+    </nav>
+
+    <div class="hbnav-toggle-btn" id="hbnav-toggle-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z" />
+        </svg>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            CircularLeftPageTransition.init();
+            VerticalPageTransition.init();
+        });
+    </script>
+    <script src="../js/page-transition-b.js"></script>
+    <script src="../js/page-transition-2-b.js"></script>
+    <script src="../js/hbnav.js"></script>
+    <!-- 腳本按正確順序載入 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="./3d-carousel.js"></script>
+    <script src="./gacha.js"></script>
+</body>
+
+</html>

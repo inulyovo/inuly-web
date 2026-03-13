@@ -1,0 +1,339 @@
+@charset "utf-8";
+
+* {
+    box-sizing: border-box;
+    transition: .2s;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    color: rgb(44, 59, 59);
+    overflow: hidden;
+    font-family: "Microsoft YaHei", "幼圆", sans-serif;
+}
+
+
+
+.back::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    position: fixed;
+    /* 關鍵：固定定位覆蓋整個視窗 */
+    top: 0;
+    left: 0;
+    z-index: -1;
+    /* 關鍵：確保在最底層 */
+}
+
+.back:hover::before {
+    backdrop-filter: none;
+}
+
+/* 深色模式背景 - 切換為另一張背景圖 */
+.back {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/ann.gif");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: 110% 110%;
+    position: fixed;
+    /* 關鍵：固定定位 */
+    top: 0;
+    left: 0;
+    z-index: 1;
+    /* 確保在載入動畫之下，背景之上 */
+}
+
+body.show-password .back {
+    background-image: url("../img/ann1.gif");
+    /* 請替換為您的第二張背景圖 */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: 110% 110%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+body.show-password .back:hover::before {
+    backdrop-filter: none;
+    /* 深色模式下滑鼠懸停時也應該取消模糊 */
+}
+
+body.show-password .back::before {
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.log {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 625px;
+    min-height: 375px;
+    background-color: rgba(50, 59, 88, 0.7);
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(50, 59, 88, 0.8);
+    backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 10;
+}
+
+/* 深色模式下的登入框樣式 */
+body.show-password .log {
+    background-color: rgba(30, 35, 55, 0.6);
+}
+
+
+
+/* ===== 統一的輸入容器 ===== */
+.input-container {
+    position: relative;
+    width: 80%;
+    margin: 10px auto;
+    height: 40px;
+    /* 固定高度 */
+}
+
+/* ===== 統一的輸入框樣式（始終保持不變）===== */
+.logbody .txt {
+    width: 100%;
+    height: 100%;
+    border: 2px solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow:
+        inset 0 0 0 2px rgba(180, 216, 233, 0.7),
+        inset 6px 6px 0 rgba(180, 216, 233, 0.2),
+        3px 3px 0 rgba(180, 216, 233, 0.2);
+    padding: 0 40px 0 10px;
+    display: block;
+    font-size: 16px;
+    color: rgba(180, 216, 233, 0.9);
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.logbody .txt:focus {
+    outline: none;
+    box-shadow:
+        inset 0 0 0 2px rgba(137, 160, 245, 0.9),
+        inset 6px 6px 0 rgba(137, 160, 245, 0.3),
+        3px 3px 0 rgba(137, 160, 245, 0.3);
+    color: rgba(137, 160, 245, 0.9);
+}
+
+/* ===== 深色模式：只改變顏色，不改變結構 ===== */
+body.show-password .logbody .txt {
+    box-shadow:
+        inset 0 0 0 2px white,
+        inset 6px 6px 0 rgba(255, 255, 255, 0.1),
+        3px 3px 0 rgba(30, 144, 255, 0.2);
+    color: white;
+}
+
+body.show-password .logbody .txt:focus {
+    box-shadow:
+        inset 0 0 0 2px rgb(255, 255, 145),
+        inset 6px 6px 0 rgba(255, 255, 255, 0.3),
+        3px 3px 0 rgba(30, 144, 255, 0.5);
+    color: white;
+}
+
+.logbody .sub {
+    width: 80%;
+    height: 45px;
+    margin-top: 30px;
+    margin-left: 10%;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(86, 116, 156, 0.8);
+    font-size: 16px;
+    font-family: "幼圆";
+    color: rgb(180, 216, 233);
+    cursor: pointer;
+}
+
+body.show-password .logbody .sub {
+    background-color: rgba(100, 130, 180, 0.85);
+}
+
+.logbody .sub:hover {
+    background-color: rgba(118, 155, 202, 0.8);
+    box-shadow: 0 0 10px rgba(118, 155, 202, 0.8);
+}
+
+body.show-password .logbody .sub:hover {
+    background-color: rgba(130, 160, 210, 0.85);
+    box-shadow: 0 0 15px rgba(100, 180, 255, 0.6);
+}
+
+.ykbt {
+    margin-top: 20px;
+    margin-left: 125%;
+    border: none;
+    background-color: transparent;
+    color: rgb(180, 216, 233);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+body.show-password .ykbt {
+    color: rgba(200, 230, 255, 0.9);
+}
+
+.ykbt:hover {
+    color: rgb(64, 160, 216);
+}
+
+body.show-password .ykbt:hover {
+    color: rgb(100, 200, 255);
+}
+
+/* ===== 眼睛按鈕樣式 ===== */
+.eyeball-btn {
+    --size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    outline: none;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    background-color: transparent;
+    z-index: 10;
+    padding: 0;
+    width: var(--size);
+    height: var(--size);
+}
+
+.eye {
+    width: var(--size);
+    height: var(--size);
+    border: 1.5px solid rgba(180, 216, 233, 0.9);
+    border-radius: calc(var(--size) / 1.5) 0;
+    transform: rotate(45deg);
+    transition: color 0.3s;
+}
+
+body.show-password .eye {
+    border-color: white;
+}
+
+.eye:before,
+.eye:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    border-radius: 100%;
+}
+
+.eye:before {
+    width: 35%;
+    height: 35%;
+    background-color: currentColor;
+}
+
+.eye:after {
+    width: 65%;
+    height: 65%;
+    border: 1.5px solid currentColor;
+}
+
+/* ===== 光束樣式 ===== */
+#beam {
+    position: absolute;
+    top: 50%;
+    right: 1.75rem;
+    clip-path: polygon(100% 50%, 100% 50%, 0 0, 0 100%);
+    width: 50vw;
+    height: 12.5vw;
+    z-index: -1;
+    mix-blend-mode: color-dodge;
+    transition: transform 200ms ease-out, opacity 0.3s;
+    transform-origin: 100% 50%;
+    transform: translateY(-50%) rotate(var(--beamDegrees, 0));
+    pointer-events: none;
+    opacity: 0;
+}
+
+body.show-password #beam {
+    opacity: 1;
+    background: rgba(255, 255, 180, 0.8);
+}
+
+@keyframes gradient {
+    100% {
+        background-position: -800% 0%;
+    }
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .log {
+        min-width: 90%;
+        min-height: 80vh;
+    }
+
+    .logtitle {
+        font-size: 40px;
+        line-height: 100px;
+    }
+
+    .input-container {
+        width: 90%;
+    }
+
+    .logbody .sub {
+        width: 90%;
+        margin-left: 5%;
+    }
+
+    .ykbt {
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        width: 90%;
+        margin-top: 10px;
+    }
+
+    .eyeball-btn {
+        right: 15px;
+    }
+}
+
+
+
+.con {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    /* 確保在最上層 */
+}

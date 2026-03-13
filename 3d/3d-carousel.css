@@ -1,0 +1,463 @@
+#lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.94);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+    perspective: 1200px;
+    pointer-events: auto !important; /* 確保能接收點擊事件 */
+}
+
+.lightbox-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 5%;
+    position: relative;
+    z-index: 2005;
+    /* 高於面板，低於按鈕 */
+}
+
+#lightbox-img {
+    max-width: 70vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 35px rgba(74, 144, 226, 0.35),
+        0 0 60px rgba(138, 43, 226, 0.25),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    transition: opacity 0.4s ease, transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transform-origin: center center;
+    transform-box: fill-box;
+    z-index: 10;
+}
+
+/* 旋轉按鈕 - 右下角 */
+#rotate-button {
+    position: absolute;
+    bottom: 80px;
+    right: 600px;
+    width: 40px;
+    height: 40px;
+    background: rgba(138, 43, 226, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 2002;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(138, 43, 226, 0.6);
+    transition: all 0.3s ease;
+    transform: scale(1);
+    opacity: 0.4;
+}
+
+#rotate-button:hover {
+    background: rgba(138, 43, 226, 1);
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4),
+        0 0 25px rgba(138, 43, 226, 0.8);
+    opacity: 1;
+}
+
+#rotate-button svg {
+    width: 24px;
+    height: 24px;
+    color: white;
+    stroke-width: 1.8;
+}
+
+/* 方向指示器 - 在按鈕上方 */
+#orientation-indicator {
+    position: absolute;
+    bottom: 130px;
+    right: 550px;
+    background: rgba(30, 30, 40, 0.9);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 14px;
+    color: #fff;
+    z-index: 2001;
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px rgba(138, 43, 226, 0.7);
+}
+
+#orientation-indicator.upright {
+    transform: translateY(0);
+    opacity: 1;
+    background: rgba(74, 144, 226, 0.3);
+    color: #4a90e2;
+}
+
+#orientation-indicator.reversed {
+    transform: translateY(0);
+    opacity: 1;
+    background: rgba(226, 74, 138, 0.3);
+    color: #e24a8a;
+}
+
+#orientation-indicator span {
+    display: none;
+}
+
+#orientation-indicator.upright .upright,
+#orientation-indicator.reversed .reversed {
+    display: inline;
+}
+
+/* 文字面板 - 分佈在圖片左右兩側 */
+#caption-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 5%;
+    opacity: 0;
+    z-index: 2001;
+    transition: all 0.4s ease;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+/* 左側面板 - 正位內容 */
+.upright-panel {
+    position: absolute;
+    left: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28%;
+    max-width: 400px;
+    background: rgba(20, 15, 30, 0.85);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(70, 50, 100, 0.7);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(74, 144, 226, 0.25);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translate(-50px, -50%);
+    transition: all 0.5s ease;
+    z-index: 2000;
+    pointer-events: auto;
+    /* 面板內容可點擊 */
+}
+
+/* 右側面板 - 逆位內容 */
+.reversed-panel {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28%;
+    max-width: 400px;
+    background: rgba(20, 15, 30, 0.85);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(70, 50, 100, 0.7);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(226, 74, 138, 0.25);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translate(50px, -50%);
+    transition: all 0.5s ease;
+    z-index: 2000;
+    pointer-events: auto;
+    /* 面板內容可點擊 */
+}
+
+/* 活動面板淡入動畫 */
+.upright-panel.active {
+    opacity: 1;
+    transform: translate(0, -50%);
+}
+
+.reversed-panel.active {
+    opacity: 1;
+    transform: translate(0, -50%);
+}
+
+/* 共同標題樣式 */
+.panel-title {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+/* 正位標題 */
+.upright-panel .panel-title {
+    color: #a0a0ff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 逆位標題 */
+.reversed-panel .panel-title {
+    color: #ff99cc;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 標籤區域 */
+.panel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.tag {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* 正位標籤 */
+.upright-panel .tag {
+    border: 1px solid rgba(100, 100, 255, 0.5);
+    color: #c0c0ff;
+}
+
+/* 逆位標籤 */
+.reversed-panel .tag {
+    border: 1px solid rgba(255, 100, 150, 0.5);
+    color: #ffccdd;
+}
+
+/* 說明文字 */
+.panel-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(230, 230, 255, 0.92);
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    text-align: justify;
+}
+
+/* 編號顯示 */
+.panel-number {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(180, 200, 255, 0.85);
+    font-style: italic;
+}
+
+/* 活動狀態指示器 */
+.activity-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #8a2be2;
+    border-radius: 50%;
+    margin-left: 8px;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+}
+
+.reversed-panel .activity-indicator {
+    background: #e24a8a;
+    box-shadow: 0 0 10px rgba(226, 74, 138, 0.8);
+}
+
+/* 鍵盤提示 */
+#keyboard-hint {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2001;
+    text-shadow: 0 0 8px rgba(138, 43, 226, 0.8);
+    background: rgba(30, 30, 40, 0.7);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 圖片切換區域光標 */
+#lightbox-overlay.lightbox-prev-area {
+    cursor: w-resize;
+}
+
+#lightbox-overlay.lightbox-next-area {
+    cursor: e-resize;
+}
+
+/* 響應式調整 */
+@media (max-width: 1200px) {
+    #lightbox-img {
+        max-width: 80vw;
+        max-height: 85vh;
+    }
+
+    .upright-panel,
+    .reversed-panel {
+        width: 35%;
+    }
+}
+
+@media (max-width: 1000px) {
+    #lightbox-img {
+        max-width: 90vw;
+        max-height: 85vh;
+    }
+
+    .upright-panel,
+    .reversed-panel {
+        width: 40%;
+        font-size: 0.95em;
+    }
+
+    .panel-tags {
+        gap: 4px;
+    }
+
+    .tag {
+        font-size: 12px;
+        padding: 2px 8px;
+    }
+}
+
+@media (max-width: 850px) {
+
+    .upright-panel,
+    .reversed-panel {
+        display: none !important;
+        /* 小屏幕上隱藏側面板 */
+    }
+
+    /* 小屏幕下改為底部面板 */
+    #caption-container {
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        flex-direction: column;
+    }
+
+    #caption-container .lightbox-panel {
+        display: block !important;
+        width: 90%;
+        margin: 0 auto;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #lightbox-img {
+        max-width: 95vw;
+        max-height: 70vh;
+        border-radius: 6px;
+    }
+
+    #rotate-button {
+        width: 50px;
+        height: 50px;
+        bottom: -30px;
+        right: -30px;
+    }
+
+    #rotate-button svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    #orientation-indicator {
+        bottom: 30px;
+        font-size: 13px;
+        padding: 3px 10px;
+    }
+
+    #keyboard-hint {
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+        width: 35px;
+        height: 35px;
+    }
+
+    .panel-title {
+        font-size: 20px;
+    }
+
+    .panel-description {
+        font-size: 15px;
+    }
+}
+
+/* 動畫關鍵幀 */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(138, 43, 226, 0.9);
+    }
+
+    100% {
+        box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+    }
+}
+
+#rotate-button {
+    animation: pulse 2s infinite;
+}
+
+/* 隱形提示文字 */
+#rotate-button::after {
+    content: "按R切換正逆位";
+    position: absolute;
+    bottom: 65px;
+    right: 0;
+    background: rgba(30, 30, 40, 0.9);
+    color: rgba(255, 255, 255, 0.85);
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    opacity: 0;
+    white-space: nowrap;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 2003;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#rotate-button:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+    background: rgba(45, 35, 65, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}

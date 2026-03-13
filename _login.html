@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入</title>
+    <link rel="stylesheet" href="./css/Loading.css">
+    <link rel="stylesheet" href="./css/login.css">
+    <style>
+        /* ===== 基礎重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===== 背景故障效果 (整合到.back) ===== */
+        .back.fault-active::before,
+        .back.fault-active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: inherit;
+            background-size: 110% 110%;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.6;
+            z-index: -1; /* 低於原始背景 */
+        }
+
+        .back.fault-active::after {
+            transform: translateX(var(--offset-red, 2px));
+            filter: grayscale(100%) sepia(1) saturate(600%) hue-rotate(0deg) brightness(0.4);
+        }
+
+        .back.fault-active::before {
+            transform: translateX(var(--offset-green, -2px));
+            filter: grayscale(100%) sepia(1) saturate(600%) hue-rotate(90deg) brightness(0.4);
+        }
+
+        /* ===== VHS 掃描線層 ===== */
+        .vhs-scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 50%,
+                rgba(0,0,0,0.15) 50%
+            );
+            background-size: 100% 2px; /* 每 2px 一條黑線 */
+            pointer-events: none;
+            z-index: 5; /* 介於背景和文字之間 */
+            display: none;
+            opacity: 0.7;
+        }
+
+        .vhs-scan-lines.active {
+            display: block;
+        }
+
+        /* ===== 四層 LOGIN 文字容器 ===== */
+        .logtitle-container {
+            position: relative;
+            height: 125px; /* 與原始 line-height 一致 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* 確保不阻擋表單點擊 */
+            margin-bottom: 20px;
+            z-index: 6; /* 高於掃描線 */
+        }
+
+        /* ===== 單層 LOGIN 樣式 (原始漸層) ===== */
+        .logtitle-layer {
+            position: absolute;
+            font-size: 50px;
+            font-weight: bolder;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, rgba(98, 201, 248, 0.6), rgba(243, 111, 255, 0.6), rgba(247, 129, 129, 0.6), rgba(241, 239, 104, 0.6), rgba(117, 226, 84, 0.6), rgba(98, 201, 248, 0.6));
+            background-size: 800%;
+            animation: gradient 30s infinite linear;
+            color: transparent;
+            white-space: nowrap;
+            transition: none !important; /* 覆蓋全域 transition */
+            user-select: none;
+        }
+
+        /* 深色模式樣式 */
+        body.show-password .logtitle-layer {
+            background-image: linear-gradient(90deg, rgba(150, 220, 255, 0.8), rgba(255, 180, 255, 0.8), rgba(255, 180, 180, 0.8), rgba(255, 255, 180, 0.8), rgba(180, 255, 180, 0.8), rgba(150, 220, 255, 0.8));
+        }
+
+        /* ===== 文字故障效果 (專為四層設計) ===== */
+        .logtitle-layer.faulttext_fault {
+            animation: none !important; /* 暫停漸層動畫 */
+        }
+
+        .logtitle-layer.faulttext_fault::after,
+        .logtitle-layer.faulttext_fault::before {
+            content: "LOGIN";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-family: Impact, sans-serif;
+            font-size: 50px;
+            font-weight: bolder;
+            letter-spacing: 0.5rem;
+            mix-blend-mode: screen;
+            z-index: 10;
+        }
+
+        .logtitle-layer.faulttext_fault::after {
+            color: #ff0000;
+            transform: translateX(2%);
+        }
+
+        .logtitle-layer.faulttext_fault::before {
+            color: #0000ff;
+            transform: translateX(-2%);
+        }
+    </style>
+</head>
+<body>
+    <!-- 載入動畫 -->
+    <div class="con" id="con">
+        <div class="load">
+            <div class="dot" style="--i:0"></div>
+            <div class="dot" style="--i:1"></div>
+            <div class="dot" style="--i:2"></div>
+            <div class="dot" style="--i:3"></div>
+            <div class="dot" style="--i:4"></div>
+            <div class="dot" style="--i:5"></div>
+            <div class="dot" style="--i:6"></div>
+        </div>
+    </div>
+    
+    <!-- 背景層 (整合故障效果) -->
+    <div class="back" id="back">
+        <!-- 掃描線層 -->
+        <div class="vhs-scan-lines" id="scanLines"></div>
+        
+        <!-- 登入表單 -->
+        <div class="log" id="log">
+            <!-- 四層 LOGIN 文字 (整合故障效果) -->
+            <div class="logtitle-container">
+                <div class="logtitle-layer">LOGIN</div>
+                <div class="logtitle-layer">LOGIN</div>
+                <div class="logtitle-layer">LOGIN</div>
+                <div class="logtitle-layer">LOGIN</div>
+            </div>
+            
+            <form action="./test3.html" id="logbody" class="logbody" onsubmit="return login()">
+                <div class="input-container">
+                    <input type="text" id="zh" size="20" class="txt" placeholder="帳號">
+                </div>
+                <div class="input-container password-container">
+                    <input type="password" id="mm" size="20" class="txt" placeholder="密碼">
+                    <button type="button" id="eyeball" class="eyeball-btn" aria-label="Toggle password visibility">
+                        <div class="eye"></div>
+                    </button>
+                    <div id="beam"></div>
+                </div>
+                <input type="submit" value="登入" id="sub" class="sub">
+                <a href="./test3.html"><input type="button" value="訪客登入" id="ykbt" class="ykbt"></a>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/login.js"></script>
+    
+    <!-- ===== 故障效果核心 JS (修復版) ===== -->
+    <script>
+        // ===== 背景故障模組 =====
+        const bgModule = {
+            bg: document.getElementById('back'),
+            scanLines: document.getElementById('scanLines'),
+            isFaulting: false,
+            
+            init() {
+                // 初始化時不自動觸發
+            },
+            
+            startFault() {
+                if (this.isFaulting) return;
+                this.isFaulting = true;
+                
+                // 隨機偏移
+                const offsetRed = (Math.random() * 8 - 4).toFixed(1);
+                const offsetGreen = (Math.random() * 8 - 4).toFixed(1);
+                
+                this.bg.style.setProperty('--offset-red', `${offsetRed}px`);
+                this.bg.style.setProperty('--offset-green', `${offsetGreen}px`);
+                
+                this.bg.classList.add('fault-active');
+                this.scanLines.classList.add('active');
+            },
+            
+            endFault() {
+                this.bg.classList.remove('fault-active');
+                this.scanLines.classList.remove('active');
+                this.isFaulting = false;
+            }
+        };
+
+        // ===== 文字故障模組 (專為四層LOGIN設計) =====
+        const textModule = {
+            player: null,
+            texts: [],
+            isAnimating: false,
+            
+            init() {
+                this.texts = [...document.querySelectorAll('.logtitle-layer')];
+            },
+            
+            startFault() {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                
+                clearInterval(this.player);
+                this.texts.forEach(text => {
+                    text.classList.add("faulttext_fault");
+                });
+                
+                this.player = setInterval(() => {
+                    this.texts.forEach(text => {
+                        // 動態位移 (範圍縮小以適應四層疊加)
+                        text.style.transform = `translate(${Math.random() * 15 - 7.5}%, ${Math.random() * 15 - 7.5}%)`;
+                        
+                        // 動態切割 (範圍縮小)
+                        let x = Math.random() * 100;
+                        let y = Math.random() * 100;
+                        let h = Math.random() * 40 + 30; // 高度範圍縮小
+                        let w = Math.random() * 30 + 20; // 寬度範圍縮小
+                        text.style.clipPath = `polygon(${x}% ${y}%, ${x + w}% ${y}%, ${x + w}% ${y + h}%, ${x}% ${y + h}%)`;
+                    });
+                }, 30);
+            },
+            
+            endFault() {
+                clearInterval(this.player);
+                this.texts.forEach(text => {
+                    text.classList.remove("faulttext_fault");
+                    text.style.transform = '';
+                    text.style.clipPath = '';
+                });
+                this.isAnimating = false;
+            }
+        };
+
+        // ===== 統一共振器 (修復版) =====
+        const synchronizer = {
+            isFaulting: false,
+            isPasswordVisible: false, // 追蹤密碼可見狀態
+            randomFaultTimer: null,   // 新增：用於管理隨機觸發器
+            
+            init() {
+                // 監聽身體類別變化 (背景切換)
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach(mutation => {
+                        if (mutation.attributeName === 'class') {
+                            const newIsPasswordVisible = document.body.classList.contains('show-password');
+                            
+                            // 只有當狀態改變時才處理
+                            if (newIsPasswordVisible !== this.isPasswordVisible) {
+                                this.isPasswordVisible = newIsPasswordVisible;
+                                
+                                // 背景切換時的處理邏輯
+                                if (this.isPasswordVisible) {
+                                    // 切換到密碼可見模式：停止所有效果
+                                    if (this.isFaulting) this.endFault();
+                                    this.stopRandomFault(); // 停止隨機觸發器
+                                } else {
+                                    // 切換回原始背景：恢復效果
+                                    this.startRandomFault(); // 重新啟動隨機觸發器
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(document.body, { attributes: true });
+                
+                // 頁面載入後啟動 (等待載入動畫結束)
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        this.isPasswordVisible = document.body.classList.contains('show-password');
+                        if (!this.isPasswordVisible) {
+                            this.startRandomFault();
+                        }
+                    }, 1000); // 等待載入動畫結束
+                });
+            },
+            
+            triggerFault() {
+                if (this.isPasswordVisible || this.isFaulting) return;
+                this.isFaulting = true;
+                
+                // 同時啟動兩個效果
+                bgModule.startFault();
+                textModule.startFault();
+                
+                // 800ms 後同時結束
+                setTimeout(() => {
+                    bgModule.endFault();
+                    textModule.endFault();
+                    this.isFaulting = false;
+                }, 800);
+            },
+            
+            // 修復重點：安全啟動隨機觸發器
+            startRandomFault() {
+                // 先清除現有定時器
+                this.stopRandomFault();
+                
+                // 只在原始背景模式下啟動
+                if (this.isPasswordVisible) return;
+                
+                const trigger = () => {
+                    const delay = Math.floor(Math.random() * 5000) + 2000; // 2~7秒
+                    this.randomFaultTimer = setTimeout(() => {
+                        // 再次確認背景狀態
+                        if (!this.isPasswordVisible && !this.isFaulting) {
+                            this.triggerFault();
+                        }
+                        // 無論如何都繼續下一次觸發
+                        trigger();
+                    }, delay);
+                };
+                trigger();
+            },
+            
+            // 修復重點：安全停止隨機觸發器
+            stopRandomFault() {
+                if (this.randomFaultTimer) {
+                    clearTimeout(this.randomFaultTimer);
+                    this.randomFaultTimer = null;
+                }
+            },
+            
+            endFault() {
+                bgModule.endFault();
+                textModule.endFault();
+                this.isFaulting = false;
+            }
+        };
+
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            bgModule.init();
+            textModule.init();
+            synchronizer.init();
+        });
+    </script>
+</body>
+</html>

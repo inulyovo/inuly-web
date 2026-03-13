@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ========== 可調整的基礎變數 ========== */
+        :root {
+            --scale-base: 1.15;           /* 整體放大係數：1.1 = 放大10%，1.2 = 放大20% */
+            --spacing-base: 1.15;          /* 間距放大係數 */
+            --avatar-size: calc(50px * var(--scale-base));
+            --card-radius: calc(12px * var(--scale-base));
+            --card-padding-y: calc(18px * var(--spacing-base));
+            --card-padding-x: calc(22px * var(--spacing-base));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            background: transparent;
+            padding: calc(20px * var(--spacing-base));
+            color: #333;
+            font-size: calc(15px * var(--scale-base));
+            line-height: calc(1.6 * var(--spacing-base));
+        }
+
+        .banner {
+            max-width: calc(1000px * var(--scale-base));
+            margin: auto;
+            padding: calc(10px * var(--spacing-base));
+        }
+
+        .banner-header {
+            text-align: center;
+            margin-bottom: calc(30px * var(--spacing-base));
+        }
+
+        .banner-header h1 {
+            font-family: "Noto Serif TC", serif;
+            font-size: calc(26px * var(--scale-base));
+            letter-spacing: 2px;
+            color: #444;
+        }
+
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(18px * var(--spacing-base));
+        }
+
+        /* 卡片 */
+        .credit-row {
+            display: flex;
+            align-items: center;
+            background: #ffffff8e;
+            border-radius: var(--card-radius);
+            padding: var(--card-padding-y) var(--card-padding-x);
+            /* border: 1px solid #ececec; */
+            position: relative;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            overflow: hidden;
+            gap: calc(18px * var(--spacing-base));
+        }
+
+        /* 背景圖片層 */
+        .credit-row::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-image: var(--bg-image);
+            opacity: 0;
+            transition: opacity 0.25s ease, background-image 0.3s ease;
+            z-index: 0;
+            border-radius: var(--card-radius);
+        }
+
+        /* hover 時顯示背景 */
+        .credit-row:hover::before {
+            opacity: 0.12;
+        }
+
+        /* hover 效果 */
+        .credit-row:hover {
+            transform: translateY(calc(-3px * var(--spacing-base)));
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 點擊反饋 */
+        .credit-row:active {
+            transform: scale(0.98);
+        }
+
+        /* 內容層（確保內容在背景之上） */
+        .credit-row>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 頭像區 */
+        .credit-avatar {
+            width: var(--avatar-size);
+            height: var(--avatar-size);
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: calc(18px * var(--spacing-base));
+            flex-shrink: 0;
+            border: 2px solid #ffad32;
+            box-shadow: 0 2px 8px rgba(255, 173, 50, 0.3);
+            transition: transform 0.25s ease;
+        }
+
+        .credit-row:hover .credit-avatar {
+            transform: scale(1.05);
+        }
+
+        .credit-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .credit-content {
+            flex: 1;
+            min-width: 0; /* 防止文字溢出 */
+        }
+
+        .credit-label {
+            font-size: calc(12px * var(--scale-base));
+            color: #999;
+            letter-spacing: 1px;
+            margin-bottom: calc(4px * var(--spacing-base));
+        }
+
+        .credit-name {
+            font-size: calc(18px * var(--scale-base));
+            font-weight: 600;
+            margin-bottom: calc(4px * var(--spacing-base));
+            color: #333;
+        }
+
+        .credit-link {
+            font-size: calc(14px * var(--scale-base));
+            display: flex;
+            align-items: center;
+            gap: calc(6px * var(--spacing-base));
+            color: #666;
+        }
+
+        .twitter-icon {
+            width: calc(16px * var(--scale-base));
+            height: calc(16px * var(--scale-base));
+            fill: #ffad32;
+            flex-shrink: 0;
+        }
+
+        .credit-link a {
+            color: #ffad32;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .credit-link a:hover {
+            text-decoration: underline;
+        }
+
+        .banner-footer {
+            margin-top: calc(35px * var(--spacing-base));
+            padding: calc(20px * var(--spacing-base));
+            border-radius: calc(10px * var(--scale-base));
+            text-align: center;
+            font-size: calc(13px * var(--scale-base));
+            color: #666;
+            line-height: calc(1.9 * var(--spacing-base));
+        }
+
+        .banner-footer .footer-title {
+            display: block;
+            font-size: calc(13px * var(--scale-base));
+            font-weight: 600;
+            color: #444;
+            margin-bottom: calc(12px * var(--spacing-base));
+            padding-bottom: calc(12px * var(--spacing-base));
+            border-bottom: 1px dashed #e0e0e0;
+            letter-spacing: 1px;
+        }
+
+        .banner-footer .footer-list {
+            list-style: none;
+            text-align: left;
+            max-width: calc(600px * var(--scale-base));
+            margin: 0 auto;
+        }
+
+        .banner-footer .footer-list li {
+            position: relative;
+            padding-left: calc(16px * var(--spacing-base));
+            margin-bottom: calc(6px * var(--spacing-base));
+            color: #777;
+        }
+
+        .banner-footer .footer-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #6f8ff7;
+            font-weight: bold;
+        }
+
+        .banner-footer .footer-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width:600px) {
+            .credit-row {
+                flex-direction: row;
+                text-align: left;
+                padding: calc(14px * var(--spacing-base)) calc(16px * var(--spacing-base));
+            }
+
+            .credit-avatar {
+                margin-right: calc(14px * var(--spacing-base));
+                width: calc(44px * var(--scale-base));
+                height: calc(44px * var(--scale-base));
+            }
+
+            .credit-name {
+                font-size: calc(16px * var(--scale-base));
+            }
+
+            .banner-header h1 {
+                font-size: calc(22px * var(--scale-base));
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="banner">
+
+        <div class="banner-header">
+            <h1>圖片版權資訊</h1>
+        </div>
+
+        <div class="credits-list">
+
+            <!-- 1 -->
+            <div class="credit-row" data-pool="0" onclick="window.open('https://twitter.com/ArsXC', '_blank')">
+                <div class="credit-avatar">
+                    <img src="https://pbs.twimg.com/profile_images/1222418334022619137/_XJu4P45_400x400.jpg" alt="ArsXC">
+                </div>
+                <div class="credit-content">
+                    <div class="credit-label">登入頁面設計</div>
+                    <div class="credit-name">ArseniXC</div>
+                    <div class="credit-link">
+                        <svg class="twitter-icon" viewBox="0 0 24 24">
+                            <path
+                                d="M22.46 6c-.77.35-1.5.58-2.23.69.8-.48 1.4-1.24 1.69-2.15-.75.45-1.6.78-2.48.96a3.92 3.92 0 0 0-6.7 3.57A11.13 11.13 0 0 1 3.15 4.9a3.9 3.9 0 0 0 1.21 5.23c-.64-.02-1.25-.2-1.78-.5v.05a3.93 3.93 0 0 0 3.15 3.85c-.3.08-.63.12-.96.12-.23 0-.46-.02-.68-.06a3.94 3.94 0 0 0 3.67 2.72A7.86 7.86 0 0 1 2 18.57a11.1 11.1 0 0 0 6 1.76c7.2 0 11.14-5.96 11.14-11.13 0-.17 0-.34-.01-.5A7.9 7.9 0 0 0 22.46 6z" />
+                        </svg>
+                        <a href="https://twitter.com/ArsXC" target="_blank" onclick="event.stopPropagation()">@ArsXC</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="credit-row" data-pool="1" onclick="window.open('https://twitter.com/OshinoUomi', '_blank')">
+                <div class="credit-avatar">
+                    <img src="https://pbs.twimg.com/profile_images/1653318530652319744/rtgABcW7_400x400.jpg"
+                        alt="Uomi">
+                </div>
+                <div class="credit-content">
+                    <div class="credit-label">圖片展示作品</div>
+                    <div class="credit-name">Uomi</div>
+                    <div class="credit-link">
+                        <svg class="twitter-icon" viewBox="0 0 24 24">
+                            <path
+                                d="M22.46 6c-.77.35-1.5.58-2.23.69.8-.48 1.4-1.24 1.69-2.15-.75.45-1.6.78-2.48.96a3.92 3.92 0 0 0-6.7 3.57A11.13 11.13 0 0 1 3.15 4.9a3.9 3.9 0 0 0 1.21 5.23c-.64-.02-1.25-.2-1.78-.5v.05a3.93 3.93 0 0 0 3.15 3.85c-.3.08-.63.12-.96.12-.23 0-.46-.02-.68-.06a3.94 3.94 0 0 0 3.67 2.72A7.86 7.86 0 0 1 2 18.57a11.1 11.1 0 0 0 6 1.76c7.2 0 11.14-5.96 11.14-11.13 0-.17 0-.34-.01-.5A7.9 7.9 0 0 0 22.46 6z" />
+                        </svg>
+                        <a href="https://twitter.com/OshinoUomi" target="_blank"
+                            onclick="event.stopPropagation()">@OshinoUomi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="credit-row" data-pool="2" onclick="window.open('https://twitter.com/HaradaMiyuki_', '_blank')">
+                <div class="credit-avatar">
+                    <img src="https://pbs.twimg.com/profile_images/1560804802078003200/olbZQuet_400x400.jpg"
+                        alt="ハラダミユキ">
+                </div>
+                <div class="credit-content">
+                    <div class="credit-label">塔羅牌插畫</div>
+                    <div class="credit-name">ハラダミユキ</div>
+                    <div class="credit-link">
+                        <svg class="twitter-icon" viewBox="0 0 24 24">
+                            <path
+                                d="M22.46 6c-.77.35-1.5.58-2.23.69.8-.48 1.4-1.24 1.69-2.15-.75.45-1.6.78-2.48.96a3.92 3.92 0 0 0-6.7 3.57A11.13 11.13 0 0 1 3.15 4.9a3.9 3.9 0 0 0 1.21 5.23c-.64-.02-1.25-.2-1.78-.5v.05a3.93 3.93 0 0 0 3.15 3.85c-.3.08-.63.12-.96.12-.23 0-.46-.02-.68-.06a3.94 3.94 0 0 0 3.67 2.72A7.86 7.86 0 0 1 2 18.57a11.1 11.1 0 0 0 6 1.76c7.2 0 11.14-5.96 11.14-11.13 0-.17 0-.34-.01-.5A7.9 7.9 0 0 0 22.46 6z" />
+                        </svg>
+                        <a href="https://twitter.com/HaradaMiyuki_" target="_blank"
+                            onclick="event.stopPropagation()">@HaradaMiyuki_</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="banner-footer">
+            <span class="footer-title">© 2026 版權聲明</span>
+            <ul class="footer-list">
+                <li>所有圖片、插畫及視覺設計之智慧財產權歸屬原創作者所有</li>
+                <li>本站僅供個人作品集展示，非商業用途</li>
+                <li>未經權利人書面同意，禁止任何形式的複製、轉載、改作或商業利用</li>
+                <li>如有侵權疑慮，請立即聯絡我們，將盡快處理</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // ========== 三張卡片各自的獨立圖片池 ==========
+        const imagePools = {
+            // 卡片 1 - ArseniXC 图片池 (使用 img 文件夹的图片)
+            0: [
+                'img/ann1.gif',
+                'img/ann.gif'
+            ],
+
+            // 卡片 2 - Uomi 图片池
+            1: [
+                'img/1.jpg',
+                'img/2.jpg',
+                'img/3.jpg',
+                'img/4.jpg',
+                'img/6.jpg',
+                'img/7.jpg',
+                'img/8.jpg',
+                'img/9.jpg',
+                'img/11.jpg'
+            ],
+
+            // 卡片 3 - ハラダミユキ 图片池
+            2: [
+                '3d/img-2/01.jpg',
+                '3d/img-2/02.jpg',
+                '3d/img-2/03.jpg',
+                '3d/img-2/04.jpg',
+                '3d/img-2/05.jpg',
+                '3d/img-2/06.jpg',
+                '3d/img-2/07.jpg',
+                '3d/img-2/08.jpg',
+                '3d/img-2/09.jpg',
+                '3d/img-2/10.jpg',
+                '3d/img-2/11.jpg',
+                '3d/img-2/12.jpg',
+                '3d/img-2/13.jpg',
+                '3d/img-2/14.jpg',
+                '3d/img-2/15.jpg',
+                '3d/img-2/16.jpg',
+                '3d/img-2/17.jpg',
+                '3d/img-2/18.jpg',
+                '3d/img-2/19.jpg',
+                '3d/img-2/20.jpg',
+                '3d/img-2/21.jpg',
+                '3d/img-2/22.jpg',
+                '3d/img-2/test.jpg'
+            ]
+        };
+
+
+        // 初始化背景图
+        document.querySelectorAll('.credit-row').forEach(row => {
+            const poolIndex = row.getAttribute('data-pool');
+            const pool = imagePools[poolIndex];
+            if (pool && pool.length > 0) {
+                const randomImage = pool[Math.floor(Math.random() * pool.length)];
+                row.style.setProperty('--bg-image', `url(${randomImage})`);
+            }
+        });
+
+        // Hover 随机切换
+        document.querySelectorAll('.credit-row').forEach(row => {
+            const poolIndex = row.getAttribute('data-pool');
+            const pool = imagePools[poolIndex];
+            let hoverTimer = null;
+
+            row.addEventListener('mouseenter', () => {
+                if (!pool || pool.length === 0) return;
+                
+                const changeImage = () => {
+                    const randomImage = pool[Math.floor(Math.random() * pool.length)];
+                    row.style.setProperty('--bg-image', `url(${randomImage})`);
+                };
+
+                changeImage();
+                hoverTimer = setInterval(changeImage, 800);
+            });
+
+            row.addEventListener('mouseleave', () => {
+                clearInterval(hoverTimer);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

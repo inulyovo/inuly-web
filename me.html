@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inuly 的個人主頁</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Noto Sans TC & Noto Serif TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@600&display=swap"
+        rel="stylesheet">
+
+    <!-- 字體定義 -->
+    <style>
+        @font-face {
+            font-family: "myfont";
+            src: url("https://www.leleo.top/fonts/faken.ttf");
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "digitalfont";
+            src: url("https://www.leleo.top/fonts/Digital-Play-Italic-St-1.ttf");
+            font-display: swap;
+        }
+    </style>
+
+    <style>
+        /* ========== CSS 變數 ========== */
+        :root {
+            --leleo-vcard-color: #FFFFFF;
+            --leleo-welcomtitle-color: #FFFFFF;
+            --leleo-blur: 5px;
+            --leleo-brightness: 85%;
+            --turntable-color-1: #FFFF00;
+            --turntable-color-2: #00FFFF;
+        }
+
+        /* ========== 基礎重置 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'myfont', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            color: var(--leleo-vcard-color);
+            min-height: 100vh;
+            background-color: #1a1a2e;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ========== 背景圖層（帶圓角和間距）========== */
+        .background-layer {
+            position: fixed;
+            top: 10px;
+            left: 0%;
+            right: 0px;
+            bottom: 0px;
+            background-size: 105%;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            z-index: -2;
+            transition: background-image 0.8s ease;
+            filter: brightness(var(--leleo-brightness));
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 頂部標題 */
+        .main-title {
+            font-family: 'myfont', sans-serif;
+            text-align: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+            color: var(--leleo-welcomtitle-color);
+        }
+
+        /* 上排內容區 */
+        .top-section {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: start;
+        }
+
+        /* ========== 左側區域 ========== */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* ========== 頭像容器 ========== */
+        .avatar-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .avatar-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        /* ========== 旋轉容器（負責定位）========== */
+        .rotation-container {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ========== 幾何旋轉方塊（只負責旋轉）========== */
+        .geo-square {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--turntable-color-1);
+            border-radius: 30%;
+            animation: geoRotate 12s infinite linear;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3),
+                inset 0 0 10px rgba(255, 255, 0, 0.1);
+            transform-origin: center center;
+        }
+
+        .geo-square::before {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            top: 5px;
+            left: 5px;
+            border: 2px solid var(--turntable-color-2);
+            border-radius: 40%;
+            transform: rotate(30deg);
+            animation: geoRotateReverse 18s infinite linear;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            transform-origin: center center;
+        }
+
+        .geo-square::after {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            top: 10px;
+            left: 10px;
+            border: 2px solid var(--turntable-color-1);
+            border-radius: 35%;
+            transform: rotate(60deg);
+            animation: geoRotate 30s infinite linear;
+            box-shadow: 0 0 6px rgba(255, 255, 0, 0.3);
+            transform-origin: center center;
+        }
+
+        /* 第四層 */
+        .geo-square-plus {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            top: 15px;
+            left: 15px;
+            border: 2px solid var(--turntable-color-2);
+            border-radius: 45%;
+            animation: geoRotateReverse 25s infinite linear;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.7;
+            transform-origin: center center;
+        }
+
+        /* ========== 旋轉動畫（完整關鍵幀）========== */
+        @keyframes geoRotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes geoRotateReverse {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(-360deg);
+            }
+        }
+
+        /* Hover 時改變速度 */
+        .avatar-wrapper:hover .geo-square {
+            animation: geoRotate 20s infinite linear;
+        }
+
+        .avatar-wrapper:hover .geo-square::before {
+            animation: geoRotateReverse 40s infinite linear;
+        }
+
+        .avatar-wrapper:hover .geo-square::after {
+            animation: geoRotate 60s infinite linear;
+        }
+
+        /* ========== 頭像 ========== */
+        .avatar {
+            position: relative;
+            z-index: 10;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin: 10px auto;
+            background: rgba(255, 255, 255, 0.1);
+            animation: avatarRotate 60s linear infinite;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes avatarRotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .avatar-wrapper:hover .avatar {
+            animation-play-state: paused;
+        }
+
+        /* ========== 頭像中心毛玻璃介紹框 ========== */
+        .avatar-intro {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 110px;
+            min-height: 110px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(var(--leleo-blur));
+            -webkit-backdrop-filter: blur(var(--leleo-blur));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            text-align: center;
+            z-index: 11;
+            transition: transform 0.3s;
+            pointer-events: none;
+        }
+
+        .avatar-intro:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        @keyframes avatarRotateReverse {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            to {
+                transform: translate(-50%, -50%) rotate(-360deg);
+            }
+        }
+
+        .avatar-wrapper:hover .avatar-intro {
+            animation-play-state: paused;
+        }
+
+        .intro-name {
+            font-family: 'myfont', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+
+        .intro-desc {
+            font-family: 'myfont', sans-serif;
+            font-size: 0.75rem;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        /* Tags 區域 */
+        .tags-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(var(--leleo-blur));
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 270px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tags-box:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        /* 🔥 Tags 切換閃爍效果 */
+        .tags-box.flash-effect {
+            animation: tagsFlash 0.4s ease;
+        }
+
+        @keyframes tagsFlash {
+
+            0%,
+            100% {
+                background: rgba(255, 255, 255, 0.1);
+                box-shadow: 0 0 0 rgba(255, 255, 0, 0);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                background: rgba(255, 255, 255, 0.25);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+
+            }
+        }
+
+        /* Tag 項目切換動畫 */
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-family: 'myfont', sans-serif;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: inline-block;
+        }
+
+        .tag.tag-out {
+            transform: translateY(-20px) scale(0.8);
+            opacity: 0;
+        }
+
+        .tag.tag-in {
+            transform: translateY(20px) scale(0.8);
+            opacity: 0;
+            animation: tagSlideIn 0.4s ease forwards;
+        }
+
+        @keyframes tagSlideIn {
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .tag:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .tags-title {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            font-family: 'myfont', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        /* 中間區域 */
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ========== 搜索框（GOOGLE & YAHOO）========== */
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(var(--leleo-blur));
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-select {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            padding-right: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            font-family: 'myfont', sans-serif;
+        }
+
+        .search-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            padding: 0.3rem;
+            font-family: 'myfont', sans-serif;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'myfont', sans-serif;
+        }
+
+        .search-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 打字機區域 */
+        .typewriter {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.3rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(var(--leleo-blur));
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1.6;
+        }
+
+        .typewriter::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            color: var(--leleo-vcard-color);
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* ========== 輸入內容區塊 ========== */
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(var(--leleo-blur));
+            -webkit-backdrop-filter: blur(var(--leleo-blur));
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .input-section:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .input-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            letter-spacing: 1px;
+            color: var(--leleo-welcomtitle-color);
+        }
+
+        .input-content {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 3;
+            text-align: justify;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .input-content p {
+            margin-bottom: 1rem;
+            text-indent: 2em;
+            text-align: justify;
+        }
+
+        .input-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 右側區域 */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10rem;
+        }
+
+        /* 時鐘卡片 (iframe 容器) */
+        .clock-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(var(--leleo-blur));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clock-card iframe {
+            width: 100%;
+            height: 330px;
+            border: none;
+            background: transparent;
+        }
+
+        /* ========== 響應式設計 ========== */
+        @media (max-width: 1200px) {
+            .top-section {
+                grid-template-columns: 200px 1fr 300px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .top-section {
+                grid-template-columns: 1fr;
+            }
+
+            .left-panel,
+            .right-panel {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .typewriter {
+                font-size: 1.1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-select {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                padding-bottom: 0.5rem;
+            }
+
+            .avatar-wrapper {
+                width: 120px;
+                height: 120px;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .avatar-intro {
+                width: 90px;
+                min-height: 90px;
+            }
+
+            .intro-name {
+                font-size: 0.9rem;
+            }
+
+            .intro-desc {
+                font-size: 0.7rem;
+            }
+
+            .background-layer,
+            .background-overlay {
+                top: 8px;
+                left: 8px;
+                right: 8px;
+                bottom: 8px;
+            }
+
+            .rotation-container {
+                width: 140px;
+                height: 140px;
+            }
+
+            .input-title {
+                font-size: 1.3rem;
+            }
+
+            .input-content {
+                font-size: 0.95rem;
+                line-height: 1.9;
+            }
+        }
+
+        .hbnav-nav,
+        .hbnav-nav-item,
+        .hbnav-text,
+        .hbnav-toggle-btn {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif !important;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        #hbnav-nav *,
+        #hbnav-toggle-btn * {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif !important;
+        }
+
+        #tags-box .tags-title,
+        #tags-box .tags-list,
+        #tags-box .tag {
+            pointer-events: none;
+            /* 子元素不響應點擊 */
+        }
+
+        /* 但保留 tag 的 hover 效果（可選）*/
+        #tags-box .tag {
+            pointer-events: auto;
+            /* 如果需要 hover，可單獨開啟 */
+        }
+    </style>
+    <link rel="stylesheet" href="./css/hbnav.css">
+</head>
+
+<body>
+    <!-- ========== 背景圖層（帶圓角和間距）========== -->
+    <div class="background-layer" id="background-layer"></div>
+    <div class="background-overlay"></div>
+
+    <div class="container">
+        <!-- 頂部標題 -->
+        <h1 class="main-title">Hi, I'm Inuly</h1>
+
+        <!-- 上排內容 -->
+        <div class="top-section">
+            <!-- 左側面板 -->
+            <div class="left-panel">
+                <!-- 頭像 + 中心介紹框 -->
+                <div class="avatar-wrapper" onclick="handleAvatarClick()" title="點擊切換背景">
+                    <!-- 旋轉容器 -->
+                    <div class="rotation-container">
+                        <div class="geo-square"></div>
+                    </div>
+
+                    <!-- 頭像 -->
+                    <div class="avatar">
+                        <img src="./img/inuly.jpg" alt="Avatar">
+                    </div>
+
+                    <div class="avatar-intro">
+                        <span class="intro-name">Inuly</span>
+                        <span class="intro-desc">前端開發者 <br>熱愛創作與探索</span>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div class="tags-box" id="tags-box" onclick="handleTagsClick(event)" title="點擊切換標籤">
+                    <div class="tags-title"> Tags</div>
+                    <div class="tags-list" id="tags-list">
+                        <span class="tag">持續學習</span>
+                        <span class="tag">靈感湧現</span>
+                        <span class="tag">自由創作</span>
+                        <span class="tag">專注當下</span>
+                        <span class="tag">積極探索</span>
+                        <span class="tag">理性思考</span>
+                        <span class="tag">解決問題</span>
+                        <span class="tag">創意實驗</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中間面板 -->
+            <div class="center-panel">
+                <!-- 搜索框（GOOGLE & YAHOO） -->
+                <div class="search-box">
+                    <select class="search-select" id="search-engine">
+                        <option value="google">Google</option>
+                        <option value="yahoo">Yahoo</option>
+                    </select>
+                    <input type="text" class="search-input" id="search-input" placeholder="輸入搜尋內容..."
+                        onkeypress="if(event.keyCode==13) performSearch()">
+                    <button class="search-btn" onclick="performSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- 打字機文字 -->
+                <div class="typewriter" id="typewriter"></div>
+
+                <!-- 輸入內容區塊 -->
+                <div class="input-section">
+                    <div class="input-title">say my name</div>
+                    <div class="input-content">
+                        <p> 本人畢業於中興大學昆蟲系，具備科學訓練的邏輯思維與數據分析能力。畢業後投入農業領域，累積農場經營、儲備植物醫師及農糧署統計調查等實務經驗。在處理農業數據與田間問題的過程中，我深刻體會到資訊化工具對產業效率的提升價值，因而決定轉職投身前端開發領域。
+                        </p>
+                        <p> 於 2025 至 2026 年投入職訓局「大數據可視化及網頁應用班」，完成 900 小時全職密集訓練。期間系統性掌握前端核心技術，包含 HTML5、CSS3、JavaScript
+                            程式設計，並深入學習 Vue.js 框架與 Bootstrap 響應式設計。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側面板 - 時鐘 iframe -->
+            <div class="right-panel">
+                <div class="clock-card">
+                    <iframe src="clock.html" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="hbnav-nav" id="hbnav-nav">
+        <a href="./test3.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Home</span>
+        </a>
+
+        <a href="./3d/3d-carousel.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Horoscope</span>
+        </a>
+
+        <a href="./in-2-scroll.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 2h18v20H3zm2 2v16h14V4zm2 2h10v12H7z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Gallery</span>
+        </a>
+        <a href="./messenger.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">News</span>
+        </a>
+
+        <a href="./me.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Me</span>
+        </a>
+
+        <a href="./_login.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 12 L6 4 L6 20 Z" />
+                    <path d="M19 8 V20 H22 V4 H19" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Logout</span>
+        </a>
+
+        <div class="hbnav-overlay"></div>
+    </nav>
+
+    <div class="hbnav-toggle-btn" id="hbnav-toggle-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z" />
+        </svg>
+    </div>
+    <script src="./js/gsap.js"></script>
+    <script src="./js/page-transition-w.js"></script>
+    <script src="./js/page-transition-2-w.js"></script>
+    <script src="./js/hbnav.js"></script>
+    <script>
+        // ========== 配置 ==========
+        const TYPEWRITER_STRINGS = [
+            "如果你看到了這行字，說明我已經成功吸引到了你的注意力。",
+            "在暴雨中行走，傘是倒掛天空的船。",
+            "生魚片是死魚片。",
+            "咖啡因來自咖啡果，所以咖啡果是因，咖啡因是果。",
+            "等紅燈是在等綠燈。",
+            "二十六歲的我已經是個八歲的大人了。",
+            "前途似錦，怪不得我一個窮人買不起。",
+            "沒做好總比沒做好。",
+            "氧氣佔空氣體積約五分之一，每次呼吸都有五分之四的機率憋死。",
+            "今日割十城，明日割五城，日取其半，萬世不竭。",
+            "有沒有一種可能，情敵其實不是敵人，而是同好。",
+            "手機每天都在我身上，我會不會其實是手機支架。",
+            "滿地都是六便士，他卻抬頭看見了監控。",
+            "一切事物都具有兩面性。所以並非一切事物都具有兩面性。",
+            "學校不給上課睡覺，卻說是夢想開始的地方。",
+            "有人問“你是唯物主義者嗎?”我回答“我覺得我是”",
+            "婚姻是愛的墳墓，良情擇墓而棲。",
+            "新年到了我就來，鞭炮響完我就走，好像我才是那年獸。",
+            "蒼蠅不叮無縫的蛋，說明蒼蠅可以檢查氣密性。",
+            "如果你覺得百事可樂很好喝，那麼它其實是可口可樂。",
+            "是藥三分毒，那毒藥是十三分毒還是三分毒。",
+            "我不喜歡自駕遊，因為自遊是無駕的。",
+            "道德綁架的人為什麼要綁架道德，自己沒有嗎？",
+            "五匹馬就能拉開商鞅了，由此可證商鞅氣密性不佳。",
+            "我租下了世界，直到我死去的那一天。",
+            "人只有醒來後才知道自己睡了一覺。",
+            "死亡算不算脫離生命危險？",
+            "油耗量是體積除以距離 (長度)，所以油耗量是面積。",
+            "如果我自殺了，那世上是多一個自殺的人還是少一個自殺的人？",
+            "小馬過河，牛說簡單，鼠道難。",
+            "把一小塊玻璃渣刺進肉裡一直不取，這樣就有東西會疼你一輩子了。",
+            "和尚逛漫展，化二次緣。",
+            "我們把老師比喻為園丁，是不是因為學生太菜。",
+            "寫遺囑的時候因為拖延症錯過了 deadline 怎麼辦？",
+            "說明書是書，書是人類進步的階梯，說明書是人類進步的階梯。",
+            "遇見電鋸殺人狂不要慌，打開抗鋸齒就好了。",
+            "顧客就是上帝，所以客觀就是主觀。",
+            "全班第一名每次都是我們班的人，感覺有什麼黑幕。",
+            "夢到我搬家了，還好夢和現實是相反的，我加班了。",
+            "看來路易十六不是被冤枉的，因為冤有頭。",
+            "先別說話，再別康橋。",
+            "雨天，我走進水坑裡，不小心踩碎了天空。",
+            "有的人看不到未來，其實是看到了未來。"
+        ];
+
+        // ========== 背景圖片配置 ==========
+        const BACKGROUNDS = {
+            gif1: "url('./img/ann1.gif')",
+            gif2: "url('./img/ann.gif')"
+        };
+
+        // ========== 兩組 Tags 配置 ==========
+        const TAGS_GROUPS = {
+            group1: [
+                "持續學習", "靈感湧現", "自由創作", "專注當下",
+                "積極探索", "理性思考", "解決問題", "創意實驗"  // ← 全部改成4字
+            ],
+            group2: [
+                "咖啡成癮", "吃貨本貨", "遊戲廢人", "靈魂畫手",
+                "選擇困難", "桌遊愛好", "電量焦慮", "追番狂魔"
+            ]
+        };
+
+        let currentBackground = 1;
+        let currentTagsGroup = 1;
+        let individualIndex = 0;
+        let isAnimating = false;
+
+        // ========== 打字機功能 ==========
+        class Typewriter {
+            constructor(elementId, strings, typeSpeed = 100, deleteSpeed = 50, pauseTime = 2000) {
+                this.element = document.getElementById(elementId);
+                this.strings = strings;
+                this.typeSpeed = typeSpeed;
+                this.deleteSpeed = deleteSpeed;
+                this.pauseTime = pauseTime;
+                this.stringIndex = 0;
+                this.charIndex = 0;
+                this.isDeleting = false;
+                this.start();
+            }
+
+            start() { this.type(); }
+
+            type() {
+                const currentString = this.strings[this.stringIndex];
+                const displayText = this.isDeleting
+                    ? currentString.substring(0, this.charIndex - 1)
+                    : currentString.substring(0, this.charIndex + 1);
+
+                this.element.textContent = displayText;
+
+                if (!this.isDeleting) { this.charIndex++; }
+                else { this.charIndex--; }
+
+                let speed = this.isDeleting ? this.deleteSpeed : this.typeSpeed;
+
+                if (!this.isDeleting && this.charIndex === currentString.length) {
+                    speed = this.pauseTime;
+                    this.isDeleting = true;
+                } else if (this.isDeleting && this.charIndex === 0) {
+                    this.isDeleting = false;
+                    this.stringIndex = (this.stringIndex + 1) % this.strings.length;
+                    speed = 500;
+                }
+
+                setTimeout(() => this.type(), speed);
+            }
+        }
+
+        // ========== Tags 切換功能 ==========
+        function switchTags(mode = 'individual', clickedTag = null) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const tagsList = document.getElementById('tags-list');
+            const tagsBox = document.getElementById('tags-box');
+            const currentGroup = currentTagsGroup === 1 ? TAGS_GROUPS.group1 : TAGS_GROUPS.group2;
+            const nextGroup = currentTagsGroup === 1 ? TAGS_GROUPS.group2 : TAGS_GROUPS.group1;
+            const tags = tagsList.querySelectorAll('.tag');
+
+            // 閃爍效果只加在 tags-box
+            tagsBox.classList.add('flash-effect');
+
+            if (mode === 'all') {
+                // 🔹 全部一起切換：8個同時淡出+淡入
+                tags.forEach((tag, i) => {
+                    tag.style.opacity = '0';
+                    tag.style.transform = 'scale(0.8)';
+                    tag.style.transition = 'all 0.3s ease';
+                    setTimeout(() => {
+                        tag.textContent = nextGroup[i];
+                        tag.style.opacity = '1';
+                        tag.style.transform = 'scale(1)';
+                    }, 150);
+                });
+                currentTagsGroup = currentTagsGroup === 1 ? 2 : 1;
+                setTimeout(() => {
+                    tagsBox.classList.remove('flash-effect');
+                    isAnimating = false;
+                }, 400);
+            }
+            else {
+                const targetTag = clickedTag;
+                const index = Array.from(tags).indexOf(targetTag);
+
+                targetTag.style.opacity = '0';
+                targetTag.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+
+                    const text = targetTag.textContent;
+
+                    if (TAGS_GROUPS.group1[index] === text) {
+                        targetTag.textContent = TAGS_GROUPS.group2[index];
+                    } else {
+                        targetTag.textContent = TAGS_GROUPS.group1[index];
+                    }
+
+                    targetTag.style.opacity = '1';
+                    targetTag.style.transform = 'translateY(0)';
+
+                    tagsBox.classList.remove('flash-effect');
+                    isAnimating = false;
+
+                }, 200);
+            }
+        }
+
+        // ========== 頭像點擊處理 ==========
+        // 點擊頭像：切換背景 + 全部 tags 一起切換
+        function handleAvatarClick() {
+            toggleBackground();
+            switchTags('all');  // ← 傳 'all' 模式
+        }
+
+        // 點擊 tags 區塊：只個別切換一個 tag
+        function handleTagsClick(event) {
+            const tag = event.target.closest('.tag');
+            if (!tag) return;
+
+            switchTags('individual', tag);
+        }
+
+        // ========== 背景切換功能 ==========
+        function toggleBackground() {
+            currentBackground = currentBackground === 1 ? 2 : 1;
+            const bgLayer = document.getElementById('background-layer');
+            bgLayer.style.backgroundImage = currentBackground === 1 ? BACKGROUNDS.gif1 : BACKGROUNDS.gif2;
+            bgLayer.style.opacity = '0.7';
+            setTimeout(() => { bgLayer.style.opacity = '1'; }, 100);
+        }
+
+        // ========== 搜索功能（GOOGLE & YAHOO）==========
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const engine = document.getElementById('search-engine').value;
+
+            if (!query) { showNotification('⚠️ 請輸入搜尋內容', 'warning'); return; }
+
+            if (/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/.*)?$/.test(query)) {
+                const url = query.startsWith('http') ? query : 'https://' + query;
+                window.open(url, '_blank');
+                return;
+            }
+
+            const engineUrls = {
+                google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                yahoo: `https://tw.search.yahoo.com/search?p=${encodeURIComponent(query)}`
+            };
+            window.open(engineUrls[engine], '_blank');
+        }
+
+        function loadInput() {
+            const input = document.getElementById('user-input');
+            const saved = localStorage.getItem('userInput');
+            if (saved) { input.value = saved; }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? 'rgba(0,255,0,0.3)' : type === 'warning' ? 'rgba(255,255,0,0.3)' : 'rgba(255,255,255,0.2)'};
+                backdrop-filter: blur(10px);
+                padding: 0.8rem 1.5rem;
+                border-radius: 25px;
+                font-family: 'Noto Sans TC', 'myfont', sans-serif;
+                font-size: 0.9rem;
+                z-index: 9999;
+                animation: slideUp 2s ease forwards;
+                border: 1px solid rgba(255,255,255,0.2);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+
+        const slideStyle = document.createElement('style');
+        slideStyle.textContent = `
+            @keyframes slideUp {
+                0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(slideStyle);
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+
+            new Typewriter('typewriter', TYPEWRITER_STRINGS);
+            loadInput();
+
+            const bgLayer = document.getElementById('background-layer');
+            bgLayer.style.backgroundImage = BACKGROUNDS.gif1;
+
+            // 初始化背景視差
+            initBackgroundParallax();
+
+            // 初始化轉場
+            CircularLeftPageTransition.init();
+            VerticalPageTransition.init();
+        });
+
+        function initBackgroundParallax() {
+
+            const bgLayer = document.getElementById("background-layer");
+
+            let targetX = 50;
+            let targetY = 50;
+            let currentX = 50;
+            let currentY = 50;
+
+            const strength = 30; // 視差強度 (建議20~40)
+
+            document.addEventListener("mousemove", (e) => {
+
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+
+                targetX = 50 + (x - 0.5) * strength;
+                targetY = 50 + (y - 0.5) * strength;
+
+            });
+
+            function animate() {
+
+                currentX += (targetX - currentX) * 0.08;
+                currentY += (targetY - currentY) * 0.08;
+
+                bgLayer.style.backgroundPosition =
+                    `${currentX}% ${currentY}%`;
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+    </script>
+</body>
+
+</html>

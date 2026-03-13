@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>infinite scrolling</title>
+    <script src="./js/gsap.js"></script>
+    <script src="./js/hbnav.js"></script>
+    <link rel="stylesheet" href="./css/hbnav - w.css">
+
+
+
+    <style>
+        /* 原始全域 reset 保留（因原始設計依賴它） */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        body {
+            background: #171717;
+        }
+
+
+
+        .inu-sb-shell {
+            position: fixed;
+            width: 84px;
+            height: 100%;
+            background: transparent;
+            z-index: 9999;
+            transition: width 0.5s ease, padding 0.5s ease;
+            padding-left: 0px;
+            overflow: hidden;
+            left: 0px;
+
+        }
+
+        .inu-sb-shell:hover {
+            width: 280px;
+        }
+
+        .inu-sb-imageBox {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .inu-sb-imageBox img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inu-sb-shell ul {
+            position: relative;
+            height: 110vh;
+        }
+
+        .inu-sb-shell ul li {
+            position: relative;
+            padding: 3px;
+            padding-top: 45px;
+        }
+
+        .inu-sb-active {
+            background: transparent;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+        }
+
+
+
+        #inu-sb-logo {
+            margin: 40px 0 100px 0;
+        }
+
+        .inu-sb-shell ul li a {
+            position: relative;
+            display: flex;
+            white-space: nowrap;
+        }
+
+        .inu-sb-icon {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 60px;
+            padding-left: 10px;
+            top: 10px;
+            height: 50px;
+            color: #333;
+            transition: 0.5s;
+        }
+
+
+        .inu-sb-text {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            color: #747272;
+            padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.5s;
+            overflow: hidden;
+            width: 0;
+            opacity: 0;
+            transition: width 0.4s ease, opacity 0.4s ease;
+            background-color: #171717cc;
+            border-radius: 50px;
+            left: 10px;
+        }
+
+        .inu-sb-shell:hover .inu-sb-text {
+            width: 180px;
+            /* 展開時寬度 */
+            opacity: 1;
+            /* 展開時可見 */
+        }
+
+        .inu-sb-shell ul li:hover a .inu-sb-icon,
+        .inu-sb-shell ul li:hover a .inu-sb-text {
+            color: #ffa117;
+        }
+
+        .inu-sb-active a .inu-sb-icon::before {
+            content: "";
+            position: absolute;
+            inset: 5px;
+            width: 40px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.5s;
+            border: 4px solid #171717;
+            box-sizing: border-box;
+        }
+    </style>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        img {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        body {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background-color: #171717;
+            overflow: hidden;
+        }
+
+        .photos {
+            position: absolute;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .photos:active {
+            cursor: grabbing;
+        }
+
+        .photos_line {
+            font-size: 1px;
+            height: 342em;
+            margin-bottom: 48em;
+            flex-shrink: 0;
+        }
+
+        .photos_line_photo {
+            font-size: 1px;
+            width: 234em;
+            height: 100%;
+            margin-right: 36em;
+            border-radius: 15em;
+            background-color: #171717;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .photos_line_photo img {
+            height: 100%;
+            transition: 0.3s ease;
+        }
+
+        .photos_line_photo:hover img {
+            transform: scale(1.2);
+        }
+
+        @media screen and (max-aspect-ratio: 1.5/1) {
+
+            .photos_line,
+            .photos_line_photo {
+                font-size: 2px;
+            }
+        }
+
+        @media screen and (max-aspect-ratio: 0.8/1) {
+
+            .photos_line,
+            .photos_line_photo {
+                font-size: 2.8px;
+            }
+        }
+
+        /* Lightbox Overlay */
+        #lightbox-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+        }
+
+        #lightbox-img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            pointer-events: auto;
+            /* 不要设置 position, top, left, transform */
+        }
+
+        #keyboard-hint {
+            position: absolute;
+            bottom: 50px;
+            right: 100px;
+            font-size: 35px;
+            color: rgba(255, 255, 255, 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 2001;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #lightbox-overlay {
+            cursor: zoom-out;
+            /* 或 'default' */
+        }
+
+        /* 左右切换区：通过 JS 动态添加 class 控制 */
+        #lightbox-overlay.lightbox-prev-area {
+            cursor: w-resize;
+            /* 向左箭头（上一张） */
+        }
+
+        #lightbox-overlay.lightbox-next-area {
+            cursor: e-resize;
+            /* 向右箭头（下一张） */
+        }
+
+        /* 图片本身：由 JS 根据是否有 url 设置 pointer */
+        #lightbox-img.can-navigate {
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        .page-transition-overlay {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+    </style>
+    <style>
+
+
+
+
+        @media (min-width: 2400px) {
+            .inu-sb-shell {
+                transform: scale(1.05);
+                transform-origin: top left;
+                width: calc(84px / 1.1);
+                padding-top: calc(30vh);
+
+            }
+
+            .inu-sb-shell:hover {
+                width: calc(280px / 1.05);
+
+            }
+
+            .inu-sb-text {
+                transform: scale(1/1.05);
+                transform-origin: left center;
+            }
+
+
+            .inu-sb-icon {
+                transform: scale(1/1.05);
+                transform-origin: left center;
+            }
+        }
+
+
+
+        @media (min-width: 2400px) {
+            body {
+                transform: scale(1.2);
+                transform-origin: top left;
+                width: calc(100vw / 1.2);
+                height: calc(100vh / 1.2);
+                overflow-x: hidden;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="inu-sb-shell">
+        <ul class="inu-sb-nav">
+            <li class="inu-sb-active" id="inu-sb-logo">
+                <a href="test3.html" data-transition>
+                    <div class="inu-sb-icon">
+                        <div class="inu-sb-imageBox">
+                        </div>
+                    </div>
+                    <div class="inu-sb-text">Main</div>
+                </a>
+            </li>
+            <li>
+                <a href="test3.html#home" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-cangku"></i>
+                    </div>
+                    <div class="inu-sb-text">Home</div>
+                </a>
+            </li>
+            <li>
+                <a href="test3.html#theme" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-zhuti_tiaosepan"></i>
+                    </div>
+                    <div class="inu-sb-text">Profile</div>
+                </a>
+            </li>
+            <li>
+                <a href="test3.html#journal" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-qianbao"></i>
+                    </div>
+                    <div class="inu-sb-text">Poker</div>
+                </a>
+            </li>
+            <!-- <li>
+                <a href="test3.html#picture" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-tupian"></i>
+                    </div>
+                    <div class="inu-sb-text">picture</div>
+                </a>
+            </li> -->
+            <li>
+                <a href="test3.html#code" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-erweima"></i>
+                    </div>
+                    <div class="inu-sb-text">Gallery</div>
+                </a>
+            </li>
+            <li>
+                <a href="test3.html#auth" data-transition>
+                    <div class="inu-sb-icon">
+                        <i class="iconfont icon-dunpaibaoxianrenzheng"></i>
+                    </div>
+                    <div class="inu-sb-text">Switch</div>
+                </a>
+            </li>
+            <li>
+                <a href="test3.html#me" data-transition>
+                    <div class="inu-sb-icon">
+                        <div class="inu-sb-imageBox">
+                        </div>
+                    </div>
+                    <div class="inu-sb-text">source</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="photos">
+        <div class="photos_line">
+            <div class="photos_line_photo"><img src="img/1.jpg" data-url="https://example.com/project1" /></div>
+            <div class="photos_line_photo"><img src="img/2.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/3.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/4.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/5.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/6.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/7.jpg" data-url="" /></div>
+        </div>
+        <div class="photos_line">
+            <div class="photos_line_photo"><img src="img/8.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/9.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/10-1.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/11.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/12.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/13.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/14.jpg" data-url="" /></div>
+        </div>
+        <div class="photos_line">
+            <div class="photos_line_photo"><img src="img/15.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/16.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/17.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/18.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/19.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/20.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/1.jpg" data-url="" /></div>
+        </div>
+        <div class="photos_line">
+            <div class="photos_line_photo"><img src="img/2.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/3.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/4.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/5.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/6.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/7.jpg" data-url="" /></div>
+            <div class="photos_line_photo"><img src="img/8.jpg" data-url="" /></div>
+        </div>
+    </div>
+
+    <!-- Lightbox Overlay -->
+    <div id="lightbox-overlay">
+        <img id="lightbox-img" src="" alt="Lightbox image" />
+        <div id="keyboard-hint">⌨</div>
+    </div>
+    <nav class="hbnav-nav" id="hbnav-nav">
+        <a href="./test3.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Home</span>
+        </a>
+
+        <a href="./3d/3d-carousel.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Horoscope</span>
+        </a>
+
+        <a href="./in-2-scroll.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 2h18v20H3zm2 2v16h14V4zm2 2h10v12H7z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Gallery</span>
+        </a>
+        <a href="./messenger.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">chat</span>
+        </a>
+
+        <a href="./me.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Me</span>
+        </a>
+
+        <a href="./_login.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <!-- 向左的三角形，且放大 -->
+                    <path d="M16 12 L6 4 L6 20 Z" />
+                    <!-- 放大的括號 -->
+                    <path d="M19 8 V20 H22 V4 H19" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Logout</span>
+        </a>
+
+        <!-- 重要：只保留一個 overlay 且放在最後 -->
+        <div class="hbnav-overlay"></div>
+    </nav>
+
+    <div class="hbnav-toggle-btn" id="hbnav-toggle-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z" />
+        </svg>
+    </div>
+    <script src="./js/page-transition-b.js"></script>
+    <script src="./js/page-transition-2-b.js"></script>
+
+    <script>
+        const photobox = {
+            container: document.querySelector(".photos"),
+            img_data: [],
+            container_width: 0,
+            container_height: 0,
+            photo_width: 0,
+            photo_height: 0,
+            if_movable: false,
+            mouse_x: 0,
+            mouse_y: 0,
+            standard_width: 1440,
+            scale_nums: 1,
+            lightboxActive: false,
+            lightboxCurrentIndex: -1,
+            allImageSources: [],
+            allImageUrls: [], // 👈 新增：存储跳转链接
+            dragHintTimeline: null,
+            keyboardHintTimeline: null,
+            userHasInteracted: false,
+            hasShownDragHint: false,
+
+            init() {
+                const allPhotos = document.querySelectorAll(".photos_line_photo img");
+                this.allImageSources = Array.from(allPhotos).map(img => img.src);
+                this.allImageUrls = Array.from(allPhotos).map(img => img.dataset.url || null);
+
+                this.resize();
+                window.addEventListener("resize", () => {
+                    this.resize();
+                });
+
+                this.showDragHint();
+
+                // 拖拽事件
+                this.container.addEventListener("mousedown", (e) => {
+                    if (this.dragHintTimeline) {
+                        this.dragHintTimeline.kill();
+                        this.dragHintTimeline = null;
+                    }
+                    this.userHasInteracted = true;
+                    this.hasShownDragHint = true;
+                    if (this.lightboxActive) return;
+                    this.if_movable = true;
+                    this.mouse_x = e.clientX;
+                    this.mouse_y = e.clientY;
+                });
+                this.container.addEventListener("mouseup", () => this.if_movable = false);
+                this.container.addEventListener("mouseleave", () => this.if_movable = false);
+                this.container.addEventListener("mousemove", (e) => this.move(e.clientX, e.clientY));
+
+
+                const photos = document.querySelectorAll(".photos_line_photo");
+                photos.forEach(photo => {
+                    photo.addEventListener("click", () => {
+                        if (this.lightboxActive) return;
+                        this.openLightbox(photo);
+                    });
+                });
+
+
+                document.addEventListener("keydown", (e) => {
+                    if (!this.lightboxActive) return;
+                    if (e.key === "ArrowLeft") {
+                        this.prevLightbox();
+                        e.preventDefault();
+                    } else if (e.key === "ArrowRight") {
+                        this.nextLightbox();
+                        e.preventDefault();
+                    } else if (e.key === "ArrowDown") {
+                        this.prevLightbox();
+                        e.preventDefault();
+                    } else if (e.key === "ArrowUp") {
+                        this.nextLightbox();
+                        e.preventDefault();
+                    } else if (e.code === "Space" || e.key === "Escape") {
+                        this.closeLightbox();
+                    }
+                });
+
+
+                const overlay = document.getElementById("lightbox-overlay");
+                overlay.addEventListener("click", (e) => {
+                    if (!this.lightboxActive || e.target !== overlay) return;
+                    const rect = overlay.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const width = rect.width;
+                    if (clickX < width * 0.3) {
+                        this.prevLightbox();
+                    } else if (clickX > width * 0.7) {
+                        this.nextLightbox();
+                    } else {
+                        this.closeLightbox();
+                    }
+                });
+
+
+                overlay.addEventListener("mousemove", (e) => {
+                    if (!this.lightboxActive) return;
+                    const rect = overlay.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const width = rect.width;
+                    overlay.classList.remove('lightbox-prev-area', 'lightbox-next-area');
+                    if (clickX < width * 0.3) {
+                        overlay.classList.add('lightbox-prev-area');
+                    } else if (clickX > width * 0.7) {
+                        overlay.classList.add('lightbox-next-area');
+                    }
+                });
+
+                // 👇 新增：灯箱图片点击（仅 Ctrl/Cmd 跳转）
+                const lightboxImg = document.getElementById('lightbox-img');
+                lightboxImg.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!this.lightboxActive || this.lightboxCurrentIndex === -1) return;
+                    const url = this.allImageUrls[this.lightboxCurrentIndex];
+                    if (url && (e.ctrlKey || e.metaKey)) {
+                        window.location.href = url; // 100% 可靠，不会被拦截
+                    }
+                });
+            },
+
+            // 更新灯箱图片光标状态
+            updateLightboxImageCursor() {
+                const lightboxImg = document.getElementById('lightbox-img');
+                const hasUrl = this.allImageUrls[this.lightboxCurrentIndex];
+                if (hasUrl) {
+                    lightboxImg.classList.add('can-navigate');
+                    lightboxImg.title = "按住 Ctrl/Cmd 并点击跳转";
+                } else {
+                    lightboxImg.classList.remove('can-navigate');
+                    lightboxImg.title = "";
+                }
+            },
+
+            showDragHint() {
+                if (this.userHasInteracted || this.hasShownDragHint || this.dragHintTimeline) return;
+                this.hasShownDragHint = true;
+                this.dragHintTimeline = gsap.timeline({
+                    onComplete: () => {
+                        this.dragHintTimeline = null;
+                        if (!this.userHasInteracted) this.hasShownDragHint = true;
+                    }
+                }).set(this.container, { x: 0, y: 0 })
+                    .to(this.container, { x: 300, y: -150, duration: 10, ease: "none" });
+            },
+
+            resize() {
+                let imgs = [...document.querySelectorAll(".photos_line_photo")];
+                this.container_width = this.container.offsetWidth;
+                this.container_height = this.container.offsetHeight;
+                this.photo_width = imgs[0].offsetWidth;
+                this.photo_height = imgs[0].offsetHeight;
+                this.scale_nums = document.body.offsetWidth / this.standard_width;
+                this.container.style.transform = `scale(${this.scale_nums})`;
+
+                if (!this.lightboxActive) {
+                    gsap.set(imgs, { x: 0, y: 0, scale: 1, opacity: 1 });
+                }
+
+                this.img_data = [];
+                imgs.forEach(img => {
+                    this.img_data.push({
+                        node: img,
+                        x: img.offsetLeft,
+                        y: img.offsetTop,
+                        mov_x: 0,
+                        mov_y: 0,
+                        ani: null
+                    });
+                });
+            },
+
+            move(x, y) {
+                if (!this.if_movable || this.lightboxActive) return;
+                let distance_x = (x - this.mouse_x) / this.scale_nums;
+                let distance_y = (y - this.mouse_y) / this.scale_nums;
+
+                this.img_data.forEach((img) => {
+                    let duration = 1;
+                    img.mov_x += distance_x;
+                    if (img.x + img.mov_x > this.container_width) {
+                        img.mov_x -= this.container_width;
+                        duration = 0;
+                    }
+                    if (img.x + img.mov_x < -this.photo_width) {
+                        img.mov_x += this.container_width;
+                        duration = 0;
+                    }
+                    img.mov_y += distance_y;
+                    if (img.y + img.mov_y > this.container_height) {
+                        img.mov_y -= this.container_height;
+                        duration = 0;
+                    }
+                    if (img.y + img.mov_y < -this.photo_height) {
+                        img.mov_y += this.container_height;
+                        duration = 0;
+                    }
+                    if (img.ani) img.ani.kill();
+                    img.ani = gsap.to(img.node, {
+                        x: img.mov_x,
+                        y: img.mov_y,
+                        duration: duration,
+                        ease: 'power4.out'
+                    });
+                });
+                this.mouse_x = x;
+                this.mouse_y = y;
+            },
+
+            openLightbox(photo) {
+                if (this.lightboxActive) return;
+                const img = photo.querySelector('img');
+                const index = this.allImageSources.indexOf(img.src);
+                if (index === -1) return;
+                this.lightboxCurrentIndex = index;
+                this.showLightboxImage(index);
+            },
+
+            showLightboxImage(index) {
+                this.lightboxActive = true;
+                this.lightboxCurrentIndex = index;
+
+                const overlay = document.getElementById('lightbox-overlay');
+                const lightboxImg = document.getElementById('lightbox-img');
+                const keyboardHint = document.getElementById('keyboard-hint');
+
+                lightboxImg.src = '';
+                lightboxImg.style.cssText = '';
+                lightboxImg.style.opacity = '0';
+                overlay.style.display = 'flex';
+                overlay.style.opacity = '0';
+                keyboardHint.style.opacity = '0';
+
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    lightboxImg.src = this.allImageSources[index];
+                    lightboxImg.offsetHeight;
+
+                    gsap.to(overlay, { opacity: 1, duration: 0.3 });
+                    gsap.to(lightboxImg, {
+                        opacity: 1,
+                        duration: 0.4,
+                        ease: "power3.out",
+                        onComplete: () => {
+                            this.updateLightboxImageCursor(); 
+                        }
+                    });
+
+                    gsap.to(keyboardHint, {
+                        opacity: 0.6,
+                        duration: 0.4,
+                        delay: 0.2,
+                        onComplete: () => {
+                            if (this.keyboardHintTimeline) {
+                                this.keyboardHintTimeline.kill();
+                            }
+                            this.keyboardHintTimeline = gsap.to(keyboardHint, {
+                                opacity: 0.3,
+                                duration: 1.2,
+                                repeat: -1,
+                                yoyo: true,
+                                ease: "sine.inOut"
+                            });
+                        }
+                    });
+                };
+                tempImg.src = this.allImageSources[index];
+                document.body.style.overflow = 'hidden';
+            },
+
+            prevLightbox() {
+                if (!this.lightboxActive) return;
+                let newIndex = this.lightboxCurrentIndex - 1;
+                if (newIndex < 0) newIndex = this.allImageSources.length - 1;
+                this.showLightboxImage(newIndex);
+            },
+
+            nextLightbox() {
+                if (!this.lightboxActive) return;
+                let newIndex = this.lightboxCurrentIndex + 1;
+                if (newIndex >= this.allImageSources.length) newIndex = 0;
+                this.showLightboxImage(newIndex);
+            },
+
+            closeLightbox() {
+                if (!this.lightboxActive) return;
+                this.lightboxActive = false;
+
+                const overlay = document.getElementById('lightbox-overlay');
+                const lightboxImg = document.getElementById('lightbox-img');
+                const keyboardHint = document.getElementById('keyboard-hint');
+
+                if (this.keyboardHintTimeline) {
+                    this.keyboardHintTimeline.kill();
+                    this.keyboardHintTimeline = null;
+                }
+
+                gsap.to([overlay, lightboxImg], {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        overlay.style.display = 'none';
+                        lightboxImg.src = '';
+                        lightboxImg.style.cssText = '';
+                        keyboardHint.style.opacity = '0';
+                        overlay.classList.remove('lightbox-prev-area', 'lightbox-next-area');
+                    }
+                });
+
+                document.body.style.overflow = '';
+            }
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            photobox.init();
+
+
+            const navItems = document.querySelectorAll(".inu-sb-nav li");
+            const logoItem = document.getElementById('inu-sb-logo');
+
+            navItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    navItems.forEach(i => i.classList.remove('inu-sb-active'));
+                    item.classList.add('inu-sb-active');
+                });
+                item.addEventListener('mouseleave', () => {
+                    if (!document.querySelector('.inu-sb-shell').matches(':hover')) {
+                        navItems.forEach(i => i.classList.remove('inu-sb-active'));
+                        logoItem.classList.add('inu-sb-active');
+                    }
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('inu-sb-active'));
+                    item.classList.add('inu-sb-active');
+                    const itemId = item.id || 'inu-sb-logo';
+                    localStorage.setItem('inu-sb-selected', itemId);
+                });
+            });
+
+            const sidebar = document.querySelector('.inu-sb-shell');
+            sidebar.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    if (!sidebar.matches(':hover')) {
+                        navItems.forEach(i => i.classList.remove('inu-sb-active'));
+                        logoItem.classList.add('inu-sb-active');
+                    }
+                }, 300);
+            });
+
+            const savedSelection = localStorage.getItem('inu-sb-selected');
+            if (savedSelection) {
+                const savedItem = document.getElementById(savedSelection);
+                if (savedItem) {
+                    navItems.forEach(i => i.classList.remove('inu-sb-active'));
+                    savedItem.classList.add('inu-sb-active');
+                }
+            }
+            CircularLeftPageTransition.init();
+            VerticalPageTransition.init();
+        });
+
+    </script>
+</body>
+
+</html>

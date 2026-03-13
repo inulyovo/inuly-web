@@ -1,0 +1,135 @@
+/* hbnav.css - 950px 專用無抖動版 */
+.hbnav-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.6);
+    transform-origin: bottom center;
+    height: 150px;
+    width: 1150px; /* 精準 950px 寬度 */
+    background-color: #0a0a0a;
+    box-shadow: 0 50px 30px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 20px 20px 90px 90px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center; /* 關鍵：內容居中 */
+    padding: 0 75px; /* (950-800)/2 = 75px 邊距 */
+    box-sizing: border-box;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+/* 確保 <a> 與 <div> 100% 行為一致 */
+.hbnav-nav-item,
+.hbnav-nav a.hbnav-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 160px; /* 5 items × 160px = 800px */
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    opacity: 0.2;
+    text-decoration: none;
+    color: inherit;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    
+    /* 消除瀏覽器預設樣式 */
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Hover 發亮效果 */
+.hbnav-nav-item:hover,
+.hbnav-nav a.hbnav-nav-item:hover {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+/* Active 狀態 */
+.hbnav-nav-item.active,
+.hbnav-nav a.hbnav-nav-item.active {
+    width: 290px;
+    opacity: 1;
+}
+
+.hbnav-nav-item.active .hbnav-icon svg,
+.hbnav-nav a.hbnav-nav-item.active .hbnav-icon svg {
+    transform: translateY(-15px);
+}
+
+.hbnav-nav-item.active .hbnav-text,
+.hbnav-nav a.hbnav-nav-item.active .hbnav-text {
+    opacity: 1;
+    transform: translateY(10px);
+}
+
+/* 關鍵修復：overlay 動畫 */
+.hbnav-overlay {
+    border-radius: 20px;
+    background-color: #0a0a0a;
+    height: 100%;
+    width: 290px;
+    position: absolute;
+    left: 60px; 
+    top: 0;
+    transition: left 0.6s cubic-bezier(0.42, 0, 0.58, 1); /* 👈 關鍵修改 */
+    z-index: 1;
+    will-change: left; /* GPU 優化 */
+}
+
+.hbnav-icon svg {
+    display: block;
+    width: 50px;
+    height: 50px;
+    fill: #e4e9f5;
+    transition: transform 0.3s ease;
+    transform: translateY(11px);
+}
+
+.hbnav-text {
+    display: block;
+    font-weight: 400;
+    font-size: 30px;
+    color: #ffa117;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(20px);
+    user-select: none;
+}
+
+.hbnav-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: #0a0a0a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+
+.hbnav-toggle-btn:hover {
+    opacity: 1;
+}
+
+.hbnav-toggle-btn svg {
+    width: 40px;
+    height: 40px;
+    fill: #e4e9f5;
+    transition: transform 0.3s ease;
+}
+
+
+/* <link rel="stylesheet" href="./css/hbnav.css"> */

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>inuの測試頁面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./css/hbnav.css">
+
+    <style>
+        html {
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge 舊版 */
+        }
+
+        html::-webkit-scrollbar {
+            display: none;
+            /* WebKit 瀏覽器：Chrome, Safari, Edge */
+        }
+
+        :root {
+            --primary-color: #ffa117;
+            --dark-bg: #0a0a0a;
+            --light-bg: #e4e9f5;
+            --text-dark: #333;
+            --text-light: #f8f9fa;
+            /* --shadow: 0 5px 25px rgba(0, 0, 0, 0.3); */
+            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        body {
+            background: var(--light-bg);
+            font-family: 'Noto Serif SC', serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* 修改導覽列樣式 */
+        .shell {
+            position: fixed;
+            width: 100px;
+            height: 100vh;
+            background: var(--dark-bg);
+            z-index: 1000;
+            transition: width 0.5s;
+            padding-left: 10px;
+            overflow: hidden;
+            /* box-shadow: 3px 0 15px rgba(0, 0, 0, 0.2); */
+        }
+
+        .shell:hover {
+            width: 215px;
+        }
+
+        .imageBox {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+        }
+
+        .imageBox img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shell ul {
+            position: relative;
+            height: 100vh;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        .shell ul li {
+            position: relative;
+            padding: 5px;
+            margin: 8px 0;
+        }
+
+        .shell ul li.active {
+            background: var(--light-bg);
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+        }
+
+        .shell ul li.active::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 5px 5px 0 5px var(--light-bg);
+            background: transparent;
+        }
+
+        .shell ul li.active::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            border-top-right-radius: 25px;
+            box-shadow: 5px -5px 0 5px var(--light-bg);
+            background: transparent;
+        }
+
+        #logo {
+            margin-bottom: 50px;
+        }
+
+        .shell ul li a {
+            position: relative;
+            display: flex;
+            white-space: nowrap;
+            padding: 20px 15px;
+        }
+
+        .icon {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 60px;
+            padding-left: 10px;
+            height: 45px;
+            transition: 0.5s;
+            color: var(--text-light);
+        }
+
+        .icon i {
+            font-size: 24px;
+            z-index: 999;
+        }
+
+        .text {
+            position: relative;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.85);
+            padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.5s;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .shell:hover .text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .shell ul li:hover a .icon,
+        .shell ul li:hover a .text,
+        .shell ul li.active a .icon,
+        .shell ul li.active a .text {
+            color: var(--primary-color);
+        }
+
+        /* Section 樣式 */
+        section {
+            min-height: 100vh;
+            padding: 80px 5%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
+            scroll-margin-top: 80px;
+        }
+
+        section h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #ffad32c1;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-family: 'Ma Shan Zheng', cursive;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        /* Theme Section 特定樣式 */
+        #theme {
+            background: var(--light-bg);
+            padding-top: 40px;
+        }
+
+        .theme-header {
+            width: 90%;
+            height: 700px;
+            overflow: hidden;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            transition: clip-path 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 60px;
+            left: 50px;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .theme-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.1);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .theme-content {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .theme-content h2 {
+            font-size: 3.5rem;
+            margin: 30px 0;
+            text-align: center;
+            color: var(--primary-color);
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .multicol {
+            column-count: 3;
+            column-gap: 2.5rem;
+            margin: 30px 0;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+
+        .multicol p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        .theme-img {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            display: block;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .theme-img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        #gallery {
+            height: 100vh;
+            /* 確保有明確高度 */
+            background: #e4e9f5 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .carousel-container {
+            width: 95%;
+            height: 100vh;
+            /* max-height: 700px; */
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .carousel-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 100px;
+            /* 修正偏移 */
+            border-radius: 20px;
+        }
+
+        #home {
+            height: 100vh;
+            /* 確保有明確高度 */
+            background: #e4e9f5 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .home {
+            width: 95%;
+            height: 100vh;
+            /* max-height: 700px; */
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .home iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 100px;
+            /* 修正偏移 */
+            border-radius: 20px;
+        }
+
+        .poker {
+            width: 95%;
+            height: 100vh;
+            /* max-height: 700px; */
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .poker iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 100px;
+            /* 修正偏移 */
+            border-radius: 20px;
+        }
+
+        .copyright {
+            width: 95%;
+            height: 100vh;
+            /* max-height: 700px; */
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .copyright iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 100px;
+            /* 修正偏移 */
+            border-radius: 20px;
+        }
+
+        .journal {
+            width: 95%;
+            height: 100vh;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        .journal iframe {
+            width: calc(100% - 100px);
+            /* 减去偏移量 */
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 100px;
+            border-radius: 20px;
+            transform: scale(1);
+            /* 不需要缩放了 */
+            transform-origin: 0 0;
+        }
+
+
+        /* 響應式設計 */
+        @media (max-width: 1200px) {
+            .multicol {
+                column-count: 2;
+            }
+
+            section h1 {
+                font-size: 4.5rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .shell {
+                width: 84px;
+            }
+
+            .shell:hover {
+                width: 260px;
+            }
+
+            section {
+                padding: 80px 3%;
+            }
+
+            .theme-header {
+                height: 550px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .multicol {
+                column-count: 1;
+            }
+
+            section h1 {
+                font-size: 3.5rem;
+            }
+
+            .theme-header {
+                height: 450px;
+            }
+
+            .shell:hover {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .shell {
+                width: 70px;
+            }
+
+            .shell:hover {
+                width: 220px;
+            }
+
+            section h1 {
+                font-size: 3rem;
+            }
+
+            .theme-header {
+                height: 400px;
+            }
+
+            .multicol {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* 滾動進度條 */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary-color);
+            z-index: 2000;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-color);
+
+        }
+
+        /* 動畫效果 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 漂浮動畫 */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+    <style>
+        .page-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e4e9f5;
+            z-index: 99999;
+            pointer-events: none;
+            border-bottom-right-radius: 100px;
+            border-top-right-radius: 100px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-right-color: #0a0a0a;
+        }
+
+        .vertical-transition-overlay {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+    </style>
+    <style>
+        /* 4K 或 2K@100% 縮放 */
+        @media (min-width: 2400px) {
+
+            #journal .journal,
+            #home .home,
+            #auth .poker,
+            #gallery .carousel-container {
+                transform: scale(1.35);
+                transform-origin: center center;
+                width: calc(96% / 1.35);
+                height: calc(100vh / 1.375);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 滾動進度條 -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- 側邊導航 - 修改為新樣式 -->
+    <div class="shell">
+        <ul class="nav">
+            <li id="logo">
+                <a>
+                    <div class="icon">
+                        <div class="imageBox">
+                            <img src="img/inuly.jpg" alt="Logo">
+                        </div>
+                    </div>
+                    <div class="text">inuly</div>
+                </a>
+            </li>
+            <li>
+                <a href="#home">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="text">Home</div>
+                </a>
+            </li>
+            <li>
+                <a href="#theme">
+                    <div class="icon">
+                        <i class="fa-brands fa-bilibili"></i>
+                    </div>
+                    <div class="text">Profile</div>
+                </a>
+            </li>
+            <li>
+                <a href="#journal">
+                    <div class="icon">
+                        <i class="fa-solid fa-chess-board"></i>
+                    </div>
+                    <div class="text">poker</div>
+                </a>
+            </li>
+            <!-- <li>
+                <a href="#gallery">
+                    <div class="icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="text">Gallery</div>
+                </a>
+            </li> -->
+            <li>
+                <a href="#code">
+                    <div class="icon">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <div class="text">Gallery</div>
+                </a>
+            </li>
+            <li>
+                <a href="#auth">
+                    <div class="icon">
+                        <i class="fa-solid fa-camera-rotate"></i>
+                    </div>
+                    <div class="text">Switch</div>
+                </a>
+            </li>
+            <li>
+                <a href="#me">
+                    <div class="icon">
+                        <i class="fa-brands fa-square-twitter"></i>
+                    </div>
+                    <div class="text">source</div>
+                </a>
+            </li>
+            <!-- <li>
+                <a href="_login .html">
+                    <div class="icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="text">Logout</div>
+                </a>
+            </li> -->
+        </ul>
+    </div>
+
+
+    <section id="home">
+        <div class="home">
+            <iframe src="home-2.html" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section id="theme" class="fade-in">
+        <h1></h1>
+        <div class="theme-header" id="themeHeader">
+            <div class="header-content">
+                <h2 class="fade-in"></h2>
+            </div>
+        </div>
+
+        <div class="theme-content">
+            <div class="multicol fade-in">
+                <p>頭部區域的動態裁剪效果，由 <code>clip-path: polygon()</code> 搭配滾動事件計算百分比實現。我們選擇 <code>clip-path</code> 而非傳統
+                    <code>height</code> 動畫，是因為前者僅觸發繪製（paint）而不引發重排（reflow），效能表現更穩定；過渡動畫則採用自訂緩動曲線
+                    <code>cubic-bezier(0.175,0.885,0.32, 1.275)</code>，模擬「先加速後緩停」的物理節奏，讓視覺過渡更自然、更具敘事感。
+                </p>
+                <p>背景圖的視差縮放效果，透過監聽滾動距離動態調整 <code>transform: scale()</code> 數值實現。相較於傳統 <code>background-position</code>
+                    方案，<code>transform</code> 能與現代瀏覽器的合成層（compositor layer）機制配合，將動畫運算交由 GPU 處理；同時設定
+                    <code>will-change: transform</code> 提前告知瀏覽器優化策略，確保在 60fps 幀率下維持流暢滾動，即使在中階裝置上也能獲得一致體驗。
+                </p>
+                <p>進場動畫採用 <code>Intersection Observer</code> API 替代傳統 <code>scroll</code> 事件監聽，避免在主執行緒頻繁觸發計算，大幅降低 CPU
+                    負擔；動畫樣式集中封裝於 <code>.fade-in</code> 類別，透過統一的 <code>opacity</code> 與 <code>transform</code>
+                    過渡設定，不僅方便全域複用，也讓後續維護或調整動畫節奏時，只需修改單一位置即可同步更新。</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                alt="Design Concept" class="theme-img fade-in">
+
+            <div class="multicol fade-in">
+                <p>頭部動態效果不僅是視覺裝飾，更是內容敘事的開場設計——透過裁剪動畫的「由滿至收」過程，暗示「內容正在展開」，符合用戶對頁面結構的心理預期；這種漸進式揭露（progressive
+                    disclosure）策略，能有效降低初次瀏覽時的認知負荷，讓使用者將注意力聚焦於核心訊息，而非被大量資訊同時淹沒。
+                </p>
+                <p>在扁平化設計成為主流的背景下，刻意透過陰影層次（<code>box-shadow</code>）、元素位移（<code>transform: translateY</code>）與
+                    <code>z-index</code>
+                    層級管理，重建介面的空間邏輯：前景內容清晰突出、中景互動元素具備回饋感、背景氛圍不干擾閱讀。這種「2.5D」的視覺策略，讓使用者能直覺理解內容主次關係，無需額外學習成本即可流暢瀏覽。
+                </p>
+                <p>動畫僅在元素進入視窗可見區域時觸發，避免無謂運算；背景與裝飾圖片採用 WebP 格式並設定 <code>srcset</code> 響應式載入，減少不必要流量；CSS
+                    選擇器避免過度嵌套與萬用選擇器，提升樣式計算效率。這些細節看似微小，但累積起來能顯著提升頁面載入速度與互動流暢度，尤其對行動裝置用戶更為友善——因為我們相信，真正的專業，是讓使用者「感覺不到技術的存在」，只專注於內容本身。
+                </p>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="journal" class="fade-in">
+        <div class="poker">
+            <iframe src="poker.html" allowfullscreen></iframe>
+        </div>
+
+    </section>
+
+    <!-- <section id="gallery">
+
+    </section> -->
+
+    <section id="code" class="fade-in">
+        <h1></h1>
+
+        <div class="cards">
+            <div class="card">採用 grid-template-columns: repeat(auto-fit, minmax(30ch, 1fr)) 實現自適應列數。</div>
+            <div class="card">grid-auto-flow: dense 啟用密度優先填充算法，自動填補網格空隙。</div>
+            <div class="card">透過 :nth-of-type() 選擇器動態分配 grid-column: span 2 與 grid-row: span 2，創造不規則拼貼視覺節奏。</div>
+            <div class="card">animation-timeline: view() 將 CSS 動畫時間軸從「時間」切換為「視窗可見度」，元素進入、停留、離開視口的過程直接映射為動畫進度
+                0%→100%，瀏覽器內部透過 ViewTimeline API 計算元素邊界與視窗視口的交集比例，無需 JavaScript
+                介入即可驅動關鍵幀插值，動畫狀態由合成器（compositor）層級直接處理，繞過主執行緒的樣式計算與佈局重排，實現 60fps 原生流暢度。</div>
+            <div class="card"><img src="./img/1.jpg" alt=""></div>
+            <div class="card">animation-range: contain 0% contain 50% 精確控制觸發區間，元素進入視口 50% 時完成動畫</div>
+            <div class="card">起始關鍵幀設定 scale(0.8) translateY(15vh)，預先將元素縮小並向下偏移，營造尚未完全進入視野的潛伏狀態，
+                終止關鍵幀回歸自然尺寸與位置，瀏覽器依據時間軸自動計算中間插值，確保運動軌跡連續平滑且無視覺斷點，視覺呈現由遠及近、由下而上的動態節奏，引導用戶視線自然聚焦於新內容，降低頁面滾動帶來的視覺跳躍突兀感。
+            </div>
+            <div class="card">透過 CSS.animationTimeline 特性檢測判斷支援度。</div>
+            <div class="card"><img src="./img/2.jpg" alt=""></div>
+            <div class="card"><img src="./img/3.jpg" alt=""></div>
+            <div class="card">不支援瀏覽器自動切換至 Intersection Observer API 方案。</div>
+            <div class="card">手動注入 opacity、transform 與 transition 屬性，確保動畫體驗一致。</div>
+            <div class="card">線性漸變背景 linear-gradient(to bottom right, #1a1f2b → #3e4b67) 營造深邃層次。</div>
+            <div class="card">box-shadow: 0px 8px 20px #00000022 提供柔和浮層效果。</div>
+            <div class="card"><img src="./img/4.jpg" alt=""></div>
+            <div class="card">border-radius: 10px 圓角處理軟化幾何邊界。</div>
+            <div class="card">object-fit: cover 確保圖片填滿卡片不變形。</div>
+            <div class="card">overflow: hidden 配合圓角實現裁剪蒙版效果。</div>
+            <div class="card">圖片與文字卡片混合排列，打破單一內容單調性。</div>
+            <div class="card"><img src="./img/5.jpg" alt=""></div>
+            <div class="card">900px 斷點：縮小最小欄寬至 25ch，調整字體大小。</div>
+            <div class="card">600px 斷點：切換為單欄佈局 grid-template-columns: 1fr。</div>
+            <div class="card">行動端重置所有 span 規則，恢復統一卡片尺寸。</div>
+            <div class="card">嚴格限定動畫屬性僅使用 opacity 與 transform，避免觸發昂貴的 DOM 版面重排與繪製作業， 瀏覽器將此類元素提升至獨立
+                GPU合成層級，繞過主執行緒的樣式計算瓶頸與阻塞風險， 有效避免 JavaScript 執行導致的掉幀現象，確保複雜滾動場景下維持 60fps
+                原生流暢度，同時降低行動裝置的電力消耗，優化資源分配，讓動畫過程平滑無遲滯且高效運行。</div>
+            <div class="card"><img src="./img/6.jpg" alt=""></div>
+            <div class="card">避免使用 scroll 事件監聽，改由瀏覽器原生 scroll-timeline 驅動。</div>
+            <div class="card">降級方案中 unobserve() 移除已觸發元素監聽，減少記憶體洩漏風險。</div>
+            <div class="card"><img src="./img/7.jpg" alt=""></div>
+            <div class="card">採用「漸進增強」策略，優先使用現代 CSS 特性，同時提供完整降級方案確保跨瀏覽器兼容性。</div>
+            <div class="card">視覺層級透過網格跨度、漸變色系與陰影深度三維度建立，強化內容可掃描性與視覺吸引力。</div>
+            <div class="card">動畫系統整合滾動驅動與 Intersection Observer 雙軌機制，兼顧效能表現與用戶體驗一致性。</div>
+        </div>
+
+        <style>
+            #code {
+                background: var(--light-bg);
+                padding-top: 60px;
+                padding-bottom: 80px;
+            }
+
+            #code h1 {
+                margin-bottom: 3rem;
+                text-align: center;
+                font-size: 5rem;
+                font-weight: 900;
+                color: #ffad32c1;
+                font-family: 'Ma Shan Zheng', cursive;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+
+            @keyframes slide-fade-in {
+                from {
+                    opacity: 0;
+                    box-shadow: none;
+                    transform: scale(.8) translateY(15vh);
+                }
+            }
+
+            .cards {
+                display: grid;
+                gap: 2rem;
+                grid-auto-flow: dense;
+                grid-template-columns: repeat(auto-fit, minmax(30ch, 1fr));
+                justify-items: center;
+                padding: 0 20px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .card {
+                animation: slide-fade-in both;
+                animation-timeline: view();
+                animation-range: contain 0% contain 50%;
+                border-radius: 10px;
+                font-family: 'Noto Serif SC', serif;
+                line-height: 1;
+                box-shadow: 0px 8px 20px #00000022;
+                font-size: 20px;
+                letter-spacing: 1px;
+                color: #fff;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background-image: linear-gradient(to bottom right, #1a1f2b, #232a3a, #2c3549, #354058, #3e4b67, #475676);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .card img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .card {
+                padding: 0;
+
+            }
+
+
+            .card:has(img) {
+                padding: 0;
+            }
+
+            .card:has(img) img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+
+            .card:not(:has(img)) {
+                padding: 20px;
+                box-sizing: border-box;
+                text-align: center;
+                line-height: 1.8;
+            }
+
+            .card:nth-of-type(4n) {
+                grid-column: span 2;
+            }
+
+            .card:nth-of-type(5n) {
+                grid-column: span 2;
+            }
+
+            .card:nth-of-type(7n) {
+                grid-row: span 2;
+            }
+
+
+            @media (max-width: 900px) {
+                .cards {
+                    grid-template-columns: repeat(auto-fit, minmax(25ch, 1fr));
+                }
+
+                .card {
+                    font-size: 24px;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .cards {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+
+                .card {
+                    font-size: 20px;
+                    height: 150px;
+                }
+
+                .card:nth-of-type(4n),
+                .card:nth-of-type(5n),
+                .card:nth-of-type(7n) {
+                    grid-column: span 1;
+                    grid-row: span 1;
+                }
+            }
+        </style>
+    </section>
+
+    <section id="auth" class="fade-in">
+        <div class="journal">
+            <iframe src="./journal-eye-2.html" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section id="me" class="fade-in">
+
+        <div class="copyright">
+            <iframe src="copyright.html" allowfullscreen></iframe>
+        </div>
+    </section>
+    <nav class="hbnav-nav" id="hbnav-nav">
+        <a href="./test3.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Home</span>
+        </a>
+
+        <a href="./3d/3d-carousel.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Horoscope</span>
+        </a>
+
+        <a href="./in-2-scroll.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 2h18v20H3zm2 2v16h14V4zm2 2h10v12H7z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Gallery</span>
+        </a>
+        <a href="./messenger.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">chat</span>
+        </a>
+
+        <a href="./me.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Me</span>
+        </a>
+
+        <a href="./_login.html" class="hbnav-nav-item" data-vertical-transition>
+            <span class="hbnav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <!-- 向左的三角形，且放大 -->
+                    <path d="M16 12 L6 4 L6 20 Z" />
+                    <!-- 放大的括號 -->
+                    <path d="M19 8 V20 H22 V4 H19" />
+                </svg>
+            </span>
+            <span class="hbnav-text">Logout</span>
+        </a>
+
+        <!-- 重要：只保留一個 overlay 且放在最後 -->
+        <div class="hbnav-overlay"></div>
+    </nav>
+
+    <div class="hbnav-toggle-btn" id="hbnav-toggle-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z" />
+        </svg>
+    </div>
+
+    <!-- <section id="login" class="fade-in">
+        <h1></h1>
+        </div>
+    </section> -->
+    <script src="./js/gsap.js"></script>
+    <script src="./js/page-transition-w.js"></script>
+    <script src="./js/page-transition-2-w.js"></script>
+    <script>
+        // 頁面載入後的初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("SessionStorage pt_incoming:", sessionStorage.getItem('pt_incoming'));
+            if ('CSS' in window && 'animationTimeline' in CSS) {
+                // 檢查瀏覽器是否支援 view()
+                const cards = document.querySelectorAll('#code .card');
+                cards.forEach(card => {
+                    card.style.animation = 'slide-fade-in both';
+                    card.style.animationTimeline = 'view()';
+                    card.style.animationRange = 'contain 0% contain 50%';
+                });
+            } else {
+                // 不支援 view() 的瀏覽器 → 改用 Intersection Observer 淡入
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'scale(1) translateY(0)';
+                            entry.target.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('#code .card').forEach(card => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8) translateY(15vh)';
+                    observer.observe(card);
+                });
+            }
+            const scrollProgress = document.getElementById('scrollProgress');
+            const navItems = document.querySelectorAll('.nav li');
+
+            // 滾動事件（進度條 + 動畫 + 導航高亮）
+            window.addEventListener('scroll', function () {
+                updateScrollProgress();
+                updateActiveNav();
+                triggerFadeIn();
+                triggerThemeAnimation();
+            });
+
+            // 僅綁定一次點擊事件：監聽所有 li
+            navItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const link = item.querySelector('a');
+                    if (!link) return;
+
+                    // 如果是 logo，滾動到頂部
+                    if (this.id === 'logo') {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                        setTimeout(updateActiveNav, 300);
+                        return;
+                    }
+
+                    const targetId = link.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    // 處理外部連結（如 login.html）
+                    if (!targetId.startsWith('#')) {
+                        window.location.href = targetId;
+                        return;
+                    }
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 20,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // ===== 以下是功能函數 =====
+
+            function updateScrollProgress() {
+                const scrollTop = document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (scrollTop / scrollHeight) * 100;
+                scrollProgress.style.width = scrolled + '%';
+            }
+
+            function updateActiveNav() {
+                const sections = document.querySelectorAll('section');
+                let currentSectionId = '';
+
+                // 找出當前 section
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+                        currentSectionId = section.getAttribute('id');
+                    }
+                });
+
+                // 滾到頂部 → 強制 home
+                if (window.pageYOffset <= 5) {
+                    currentSectionId = 'home';
+                }
+
+                // 清除所有 active
+                navItems.forEach(item => item.classList.remove('active'));
+
+                // 激活對應項
+                navItems.forEach(item => {
+                    const link = item.querySelector('a');
+                    if (link && link.getAttribute('href') === `#${currentSectionId}`) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            function triggerFadeIn() {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    const pos = el.getBoundingClientRect().top;
+                    if (pos < window.innerHeight / 1.3) {
+                        el.classList.add('appear');
+                    }
+                });
+            }
+
+            function triggerThemeAnimation() {
+                const themeHeader = document.getElementById('themeHeader');
+                if (!themeHeader) return;
+
+                const themeSection = document.getElementById('theme');
+                const scrollTop = window.pageYOffset;
+                const themeTop = themeSection.offsetTop;
+                let scrollDistance = scrollTop - (themeTop - window.innerHeight * 0.1);
+                scrollDistance = Math.max(0, Math.min(scrollDistance, 1000));
+                const bottomPercent = 100 - (scrollDistance / 1000) * 60;
+                themeHeader.style.clipPath = `polygon(0 0, 100% 0, 100% ${bottomPercent}%, 0 100%)`;
+            }
+
+            // 初始觸發
+            updateScrollProgress();
+            triggerFadeIn();
+            CircularLeftPageTransition.init();
+            VerticalPageTransition.init();
+        });
+    </script>
+    <script src="./js/hbnav.js"></script>
+
+</body>
+
+</html>

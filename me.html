@@ -47,13 +47,19 @@
             box-sizing: border-box;
         }
 
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
         body {
             font-family: 'myfont', 'Segoe UI', 'Microsoft YaHei', sans-serif;
             color: var(--leleo-vcard-color);
             min-height: 100vh;
             background-color: #1a1a2e;
             position: relative;
-            overflow-x: hidden;
+
         }
 
         /* ========== 背景圖層（帶圓角和間距）========== */
@@ -619,39 +625,98 @@
         /* ========== 手機版專屬調整 ========== */
         @media (max-width: 576px) {
 
-            /* 外層容器：圓角 + 間距調整 */
+            /* 背景層：移除多餘間距與圓角 */
             .background-wrapper {
-                top: 8px;
-                left: 0px;
-                right: 0px;
-                bottom: 8px;
-                border-top-left-radius: 12px;
-                /* 手機版圓角調小 */
-                border-top-right-radius: 12px;
-                /* overflow: hidden 繼承自桌面版，無需重複 */
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
             }
 
-            /* 內層背景：加大緩衝區 + 降低視差影響 */
             .background-layer {
-                top: -15%;
-                /* 🔑 加大負向偏移 */
-                left: -15%;
-                width: 130%;
-                /* 🔑 加大尺寸緩衝 */
-                height: 130%;
-                /* 可選：手機版稍微降低亮度避免邊緣明顯 */
-                filter: brightness(calc(var(--leleo-brightness) - 5%));
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                transform: none !important;
             }
-        }
 
-        /* 超小屏幕額外保護（可選） */
-        @media (max-width: 375px) {
-            .background-layer {
-                top: -20%;
-                left: -20%;
-                width: 140%;
-                height: 140%;
+            /* 容器內距縮小 */
+            .container {
+                padding: 1rem;
             }
+
+            /* 標題縮小 */
+            .main-title {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            /* 上排區塊間距縮小 */
+            .top-section {
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            /* 右側面板：關鍵修復！覆蓋 10rem 的過大間距 */
+            .right-panel {
+                gap: 1.5rem !important;
+                width: 100%;
+            }
+
+            .clock-card iframe {
+                height: 330px;
+                width: 100%;
+                padding-right: 3vh;
+            }
+
+            /* 防止 flex 子元素溢出 */
+            .left-panel,
+            .center-panel,
+            .right-panel {
+                min-width: 0;
+                width: 100%;
+            }
+
+            /* 搜索框在手機版改為垂直排列（可選） */
+            .search-box {
+                flex-wrap: wrap;
+            }
+
+            .search-select {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                padding-bottom: 0.3rem;
+            }
+
+            /* 打字機文字縮小 */
+            .typewriter {
+                font-size: 0.7rem;
+                min-height: 60px;
+                padding: 0.8rem;
+            }
+
+            /* 輸入內容區塊 */
+            .input-content {
+                font-size: 0.95rem;
+                line-height: 2.2;
+            }
+
+            /* 頭像區域微調 */
+            .avatar-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+
+            .avatar {
+                width: 120px;
+                height: 120px;
+            }
+
+
         }
 
         .hbnav-nav,
@@ -855,7 +920,7 @@
             "今日割十城，明日割五城，日取其半，萬世不竭。",
             "有沒有一種可能，情敵其實不是敵人，而是同好。",
             "手機每天都在我身上，我會不會其實是手機支架。",
-            "滿地都是六便士，他卻抬頭看見了監控。",
+            "滿地都是六便士，他卻抬頭看見了監視器。",
             "一切事物都具有兩面性。所以並非一切事物都具有兩面性。",
             "學校不給上課睡覺，卻說是夢想開始的地方。",
             "有人問“你是唯物主義者嗎?”我回答“我覺得我是”",
@@ -863,7 +928,7 @@
             "新年到了我就來，鞭炮響完我就走，好像我才是那年獸。",
             "蒼蠅不叮無縫的蛋，說明蒼蠅可以檢查氣密性。",
             "如果你覺得百事可樂很好喝，那麼它其實是可口可樂。",
-            "是藥三分毒，那毒藥是十三分毒還是三分毒。",
+            "是藥三分毒，那毒藥是十三分毒還是三分毒?",
             "我不喜歡自駕遊，因為自遊是無駕的。",
             "道德綁架的人為什麼要綁架道德，自己沒有嗎？",
             "五匹馬就能拉開商鞅了，由此可證商鞅氣密性不佳。",
@@ -873,7 +938,7 @@
             "油耗量是體積除以距離 (長度)，所以油耗量是面積。",
             "如果我自殺了，那世上是多一個自殺的人還是少一個自殺的人？",
             "小馬過河，牛說簡單，鼠道難。",
-            "把一小塊玻璃渣刺進肉裡一直不取，這樣就有東西會疼你一輩子了。",
+            "把玻璃渣刺進肉裡一直不取，這樣就有東西會疼你一輩子了。",
             "和尚逛漫展，化二次緣。",
             "我們把老師比喻為園丁，是不是因為學生太菜。",
             "寫遺囑的時候因為拖延症錯過了 deadline 怎麼辦？",

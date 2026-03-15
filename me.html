@@ -623,30 +623,7 @@
         }
 
         /* ========== 手機版專屬優化 ========== */
-        @media (max-width: 768px) {
-            .background-layer {
-                /* 禁用硬件加速避免閃爍 */
-                will-change: auto !important;
-                transform: none !important;
-                backface-visibility: hidden;
-            }
 
-            /* 手機版禁用 backdrop-filter */
-            .tags-box,
-            .search-box,
-            .typewriter,
-            .input-section,
-            .clock-card,
-            .avatar-intro {
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-                background: rgba(26, 26, 46, 0.9) !important;
-            }
-
-            .avatar-intro {
-                background: rgba(255, 255, 255, 0.95) !important;
-            }
-        }
 
         /* ========== 手機版專屬調整 ========== */
         @media (max-width: 576px) {

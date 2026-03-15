@@ -622,6 +622,32 @@
             }
         }
 
+        /* ========== 手機版專屬優化 ========== */
+        @media (max-width: 768px) {
+            .background-layer {
+                /* 禁用硬件加速避免閃爍 */
+                will-change: auto !important;
+                transform: none !important;
+                backface-visibility: hidden;
+            }
+
+            /* 手機版禁用 backdrop-filter */
+            .tags-box,
+            .search-box,
+            .typewriter,
+            .input-section,
+            .clock-card,
+            .avatar-intro {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                background: rgba(26, 26, 46, 0.9) !important;
+            }
+
+            .avatar-intro {
+                background: rgba(255, 255, 255, 0.95) !important;
+            }
+        }
+
         /* ========== 手機版專屬調整 ========== */
         @media (max-width: 576px) {
 
@@ -955,9 +981,29 @@
 
         // ========== 背景圖片配置 ==========
         const BACKGROUNDS = {
+            // 桌面版 GIF
             gif1: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann1.gif')",
-            gif2: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.gif')"
+            gif2: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.gif')",
+
+            // 手機版 PNG（新增）
+            png1: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann1.png')",
+            png2: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.png')"
         };
+
+        // 檢測是否為手機設備
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || window.innerWidth <= 768;
+        }
+
+        // 取得當前設備適用的背景
+        function getCurrentBackground(index) {
+            if (isMobile()) {
+                return index === 1 ? BACKGROUNDS.png1 : BACKGROUNDS.png2;
+            } else {
+                return index === 1 ? BACKGROUNDS.gif1 : BACKGROUNDS.gif2;
+            }
+        }
 
         // ========== 兩組 Tags 配置 ==========
         const TAGS_GROUPS = {
@@ -1093,12 +1139,29 @@
         }
 
         // ========== 背景切換功能 ==========
+        // ========== 背景切換功能（優化版）==========
         function toggleBackground() {
             currentBackground = currentBackground === 1 ? 2 : 1;
             const bgLayer = document.getElementById('background-layer');
-            bgLayer.style.backgroundImage = currentBackground === 1 ? BACKGROUNDS.gif1 : BACKGROUNDS.gif2;
-            bgLayer.style.opacity = '0.7';
-            setTimeout(() => { bgLayer.style.opacity = '1'; }, 100);
+
+            // 根據設備類型選擇背景
+            const newBackground = getCurrentBackground(currentBackground);
+
+            // 手機版：直接切換（不淡入淡出）
+            if (isMobile()) {
+                bgLayer.style.backgroundImage = newBackground;
+                bgLayer.style.opacity = '1';
+            } else {
+                // 桌面版：保留淡入淡出效果
+                bgLayer.style.transition = 'opacity 0.3s ease';
+                bgLayer.style.opacity = '0.7';
+                setTimeout(() => {
+                    bgLayer.style.backgroundImage = newBackground;
+                    setTimeout(() => {
+                        bgLayer.style.opacity = '1';
+                    }, 100);
+                }, 300);
+            }
         }
 
         // ========== 搜索功能（GOOGLE & YAHOO）==========
@@ -1162,21 +1225,43 @@
 
         // ========== 初始化 ==========
         document.addEventListener('DOMContentLoaded', () => {
-
             new Typewriter('typewriter', TYPEWRITER_STRINGS);
             loadInput();
 
             const bgLayer = document.getElementById('background-layer');
-            bgLayer.style.backgroundImage = BACKGROUNDS.gif1;
 
-            // 初始化背景視差
+            // 根據設備類型初始化背景
+            bgLayer.style.backgroundImage = getCurrentBackground(1);
+
+            // 手機版禁用 will-change 避免閃爍
+            if (isMobile()) {
+                bgLayer.style.willChange = 'auto';
+                bgLayer.style.transform = 'none';
+            }
+
+            // 初始化背景視差（內部會判斷是否為手機）
             initBackgroundParallax();
 
             // 初始化轉場
             CircularLeftPageTransition.init();
             VerticalPageTransition.init();
-        });
 
+            // 預載入圖片（兩種格式都預載入）
+            preloadBackgrounds();
+        });
+        function preloadBackgrounds() {
+            const imageUrls = [
+                'https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann1.gif',
+                'https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.gif',
+                'https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann1.png',
+                'https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.png'
+            ];
+
+            imageUrls.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
         function initBackgroundParallax() {
             const bgLayer = document.getElementById("background-layer");
 

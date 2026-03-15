@@ -54,18 +54,17 @@
         /* 修改導覽列樣式 */
         .shell {
             position: fixed;
-            width: 100px;
+            width: 12vh;
             height: 100vh;
             background: var(--dark-bg);
             z-index: 1000;
-            transition: width 0.5s;
+            transition: width .5s;
             padding-left: 10px;
             overflow: hidden;
-            /* box-shadow: 3px 0 15px rgba(0, 0, 0, 0.2); */
         }
 
         .shell:hover {
-            width: 215px;
+            width: 22.5vh;
         }
 
         .imageBox {
@@ -280,127 +279,41 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        #gallery {
-            height: 100vh;
-            /* 確保有明確高度 */
-            background: #e4e9f5 !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
+        :root {
+            --nav-offset: 12vh;
         }
 
-        .carousel-container {
-            width: 95%;
-            height: 100vh;
-            /* max-height: 700px; */
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .carousel-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        /* iframe 共用設定 */
+        .carousel-container iframe,
+        .home iframe,
+        .poker iframe,
+        .copyright iframe,
+        .journal iframe {
             position: absolute;
             top: 0;
-            left: 100px;
-            /* 修正偏移 */
-            border-radius: 20px;
-        }
-
-        #home {
-            height: 100vh;
-            /* 確保有明確高度 */
-            background: #e4e9f5 !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-        }
-
-        .home {
-            width: 95%;
-            height: 100vh;
-            /* max-height: 700px; */
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .home iframe {
-            width: 100%;
+            left: var(--nav-offset);
+            width: calc(100% - var(--nav-offset));
             height: 100%;
             border: none;
-            position: absolute;
-            top: 0;
-            left: 100px;
-            /* 修正偏移 */
             border-radius: 20px;
         }
 
-        .poker {
-            width: 95%;
-            height: 100vh;
-            /* max-height: 700px; */
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .poker iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            position: absolute;
-            top: 0;
-            left: 100px;
-            /* 修正偏移 */
-            border-radius: 20px;
-        }
-
-        .copyright {
-            width: 95%;
-            height: 100vh;
-            /* max-height: 700px; */
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .copyright iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            position: absolute;
-            top: 0;
-            left: 100px;
-            /* 修正偏移 */
-            border-radius: 20px;
-        }
-
+        /* 容器 */
+        .carousel-container,
+        .home,
+        .poker,
+        .copyright,
         .journal {
             width: 95%;
             height: 100vh;
             position: relative;
             border-radius: 20px;
             overflow: hidden;
-            transform: translateZ(0);
         }
 
-        .journal iframe {
-            width: calc(100% - 100px);
-            /* 减去偏移量 */
-            height: 100%;
-            border: none;
-            position: absolute;
-            top: 0;
-            left: 100px;
-            border-radius: 20px;
-            transform: scale(1);
-            /* 不需要缩放了 */
-            transform-origin: 0 0;
+        /* journal 原本有 transform */
+        .journal {
+            transform: translateZ(0);
         }
 
 
@@ -538,18 +451,57 @@
         }
     </style>
     <style>
-        /* 4K 或 2K@100% 縮放 */
         @media (min-width: 2400px) {
 
-            #journal .journal,
             #home .home,
-            #auth .poker,
+            #journal .poker,
             #gallery .carousel-container {
-                transform: scale(1.35);
+                transform: scale(1.1);
                 transform-origin: center center;
                 width: calc(96% / 1.35);
                 height: calc(100vh / 1.375);
             }
+        }
+
+        @media (min-width: 2400px) {
+
+            #auth .journal {
+                transform: scale(1.1) translateY(5vh);
+                transform-origin: center center;
+                width: calc(96% / 1.35);
+                height: calc(100vh / 1.375);
+            }
+        }
+
+        @media (min-width: 2000px) {
+
+            #home .home,
+            #journal .poker,
+            #gallery .carousel-container {
+                transform: scale(1.1);
+                transform-origin: center center;
+                width: calc(96% / 1.35);
+                height: calc(100vh / 1.375);
+            }
+        }
+
+        @media (min-width: 2000px) {
+
+            #auth .journal {
+                transform: scale(1.1) translateY(5vh);
+                transform-origin: center center;
+                width: calc(96% / 1.35);
+                height: calc(100vh / 1.33);
+            }
+        }
+
+        @media (max-width:1100px) {
+
+
+            .shell {
+                display: none;
+            }
+
         }
     </style>
 </head>

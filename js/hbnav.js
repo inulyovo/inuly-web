@@ -1,4 +1,4 @@
-// hbnav.js - 950px 專用無抖動版
+// hbnav.js - 950px 專用無抖動版（響應式高度修正）
 (function () {
     'use strict';
 
@@ -19,21 +19,29 @@
 
         let isOpen = false;
         let isAnimating = false;
-        const ITEM_WIDTH = 160; // 每個項目寬度
-        const NAV_PADDING = 75; // 左側邊距 (950-800)/2
+        const ITEM_WIDTH = 160;
+        const NAV_PADDING = 75;
 
-        // 初始化位置
         gsap.set(nav, { y: 150 });
 
-        // 設置初始 active 項
         if (items[0]) {
             items[0].classList.add('active');
-            overlay.style.left = NAV_PADDING + 'px'; // 初始位置 = 邊距
+            overlay.style.left = NAV_PADDING + 'px';
         }
 
         function toggleNav() {
             if (isAnimating) return;
             isAnimating = true;
+
+            // 🔑 響應式高度設定
+            const isMobile = window.innerWidth <= 576;
+            const isSuperSmall = window.innerWidth <= 375;
+            
+            const expandBottom = isSuperSmall ? '90px'
+                             : isMobile ? '100px'
+                             : '130px';
+            
+            const collapseBottom = isMobile ? '15px' : '20px';
 
             if (!isOpen) {
                 gsap.to(nav, {
@@ -42,7 +50,7 @@
                     ease: 'power2.out'
                 });
                 gsap.to(toggleBtn, {
-                    bottom: '130px',
+                    bottom: expandBottom,
                     duration: 0.55,
                     ease: 'power2.out'
                 });
@@ -52,7 +60,6 @@
                     ease: 'power2.inOut'
                 });
 
-                // 展開後重置位置
                 setTimeout(() => {
                     const activeIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
                     if (activeIndex >= 0) {
@@ -69,7 +76,7 @@
                     ease: 'power2.in'
                 });
                 gsap.to(toggleBtn, {
-                    bottom: '20px',
+                    bottom: collapseBottom,
                     duration: 0.55,
                     ease: 'power2.in'
                 });
@@ -85,29 +92,21 @@
 
         toggleBtn.addEventListener('click', toggleNav);
 
-        // 關鍵修復：精準位置計算
         items.forEach((item, index) => {
             item.addEventListener('mouseenter', (e) => {
                 e.stopPropagation();
-
                 if (!isOpen || isAnimating) return;
-
-                // 移除所有 active
                 items.forEach(el => el.classList.remove('active'));
                 item.classList.add('active');
-
-                // 精準計算位置：邊距 + 项目索引×宽度
                 overlay.style.left = (NAV_PADDING + index * ITEM_WIDTH) + 'px';
             });
         });
 
-        // 點擊外部關閉
         document.body.addEventListener('click', (e) => {
             if (nav.contains(e.target) || toggleBtn.contains(e.target)) return;
             if (isOpen) toggleNav();
         });
 
-        // 視窗大小變化時重置
         window.addEventListener('resize', () => {
             if (isOpen) {
                 const activeIndex = Array.from(items).findIndex(item => item.classList.contains('active'));

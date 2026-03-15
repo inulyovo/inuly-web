@@ -10,7 +10,8 @@
     transition: opacity 0.3s ease;
     cursor: zoom-out;
     perspective: 1200px;
-    pointer-events: auto !important; /* 確保能接收點擊事件 */
+    pointer-events: auto !important;
+    /* 確保能接收點擊事件 */
 }
 
 .lightbox-container {
@@ -312,66 +313,140 @@
     cursor: e-resize;
 }
 
-/* 響應式調整 */
-@media (max-width: 1200px) {
-    #lightbox-img {
-        max-width: 80vw;
-        max-height: 85vh;
-    }
+/* 手機版響應式樣式 - 修正版 */
+@media (max-width: 1760px) {
 
-    .upright-panel,
-    .reversed-panel {
-        width: 35%;
-    }
-}
-
-@media (max-width: 1000px) {
-    #lightbox-img {
-        max-width: 90vw;
-        max-height: 85vh;
-    }
-
-    .upright-panel,
-    .reversed-panel {
-        width: 40%;
-        font-size: 0.95em;
-    }
-
-    .panel-tags {
-        gap: 4px;
-    }
-
-    .tag {
-        font-size: 12px;
-        padding: 2px 8px;
-    }
-}
-
-@media (max-width: 850px) {
-
-    .upright-panel,
-    .reversed-panel {
-        display: none !important;
-        /* 小屏幕上隱藏側面板 */
-    }
-
-    /* 小屏幕下改為底部面板 */
-    #caption-container {
-        top: auto;
-        bottom: 20px;
-        transform: none;
+    /* 1. 燈箱主容器：改為垂直滾動，內容靠左 */
+    #lightbox-overlay {
+        display: flex;
+        /* 啟用 Flex */
         flex-direction: column;
+        /* 垂直排列 */
+        align-items: flex-start;
+        /* 關鍵：所有內容靠左對齊 */
+        justify-content: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 20px 15px 100px 15px;
+        cursor: default;
+        height: 100%;
     }
 
-    #caption-container .lightbox-panel {
-        display: block !important;
-        width: 90%;
-        margin: 0 auto;
-        opacity: 1 !important;
+    /* 2. 圖片容器 */
+    #lightbox-img {
+        position: relative;
+        /* 改為相對定位，脫離絕對定位 */
+        max-width: 100%;
+        max-height: 50vh;
+        width: auto;
+        margin: 0 auto 30px auto;
+        /* 圖片本身可以置中，或者改為 margin-left: 0 靠左 */
         transform: none !important;
+        display: block;
+        z-index: 1000;
+    }
+
+    /* 3. 文字容器 - 關鍵修改 */
+    #caption-container {
+        position: relative !important;
+        /* 強制改為相對定位，不再浮動 */
+        top: auto !important;
+        /* 取消垂直置中 */
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        /* 取消位移 */
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        opacity: 1;
+        display: flex;
+        flex-direction: column;
+        /* 面板垂直排列 */
+        align-items: center;
+        /* 面板靠左 */
+        z-index: 2001;
+        pointer-events: auto;
+    }
+
+    /* 4. 面板樣式 (正位/逆位) */
+    .upright-panel,
+    .reversed-panel {
+        position: relative !important;
+        /* 強制相對定位 */
+        left: 0 !important;
+        /* 強制靠左 */
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        /* 取消動畫位移 */
+        width: 100% !important;
+        /* 填滿寬度 */
+        max-width: 100%;
+        margin: 0 0 20px 0;
+        /* 只保留底部間距 */
+        padding: 20px;
+        box-sizing: border-box;
+        opacity: 0;
+        display: none;
+        /* 預設隱藏 */
+        text-align: left;
+        /* 文字靠左 */
+        border-radius: 16px;
+        /* 保留原本的背景與陰影樣式 */
+        background: rgba(20, 15, 30, 0.95);
+        border: 1px solid rgba(70, 50, 100, 0.7);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+    }
+
+    /* 顯示 active 的面板 */
+    .upright-panel.active,
+    .reversed-panel.active {
+        opacity: 1;
+        display: block;
+        animation: fadeIn 0.5s ease;
+        /* 可選：加入淡入動畫 */
+    }
+
+    /* 5. 固定按鈕 (保持不變) */
+    #rotate-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 3000;
+    }
+
+    #orientation-indicator {
+        position: fixed;
+        bottom: 75px;
+        right: 20px;
+        z-index: 2999;
+    }
+
+    #keyboard-hint {
+        display: none;
     }
 }
 
+/* 更小螢幕微調 */
+@media (max-width: 480px) {
+    #lightbox-img {
+        max-height: 40vh;
+        margin-left: 0;
+        /* 圖片也靠左 */
+        margin-right: 0;
+    }
+
+    .upright-panel.active,
+    .reversed-panel.active {
+        padding: 15px;
+        font-size: 14px;
+    }
+}
+
+
+/* 
 @media (max-width: 768px) {
     #lightbox-img {
         max-width: 95vw;
@@ -412,7 +487,11 @@
     .panel-description {
         font-size: 15px;
     }
-}
+
+    #tarot-draw-button {
+        top: 5vh;
+    }
+} */
 
 /* 動畫關鍵幀 */
 @keyframes pulse {

@@ -57,20 +57,32 @@
         }
 
         /* ========== 背景圖層（帶圓角和間距）========== */
-        .background-layer {
+        .background-wrapper {
             position: fixed;
             top: 10px;
-            left: 0%;
-            right: 0px;
-            bottom: 0px;
-            background-size: 105%;
-            background-position: center;
-            background-repeat: no-repeat;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 110vh;
             border-top-left-radius: 16px;
             border-top-right-radius: 16px;
+            overflow: hidden;
             z-index: -2;
-            transition: background-image 0.8s ease;
+            pointer-events: none;
+        }
+
+        .background-layer {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             filter: brightness(var(--leleo-brightness));
+            will-change: transform;
         }
 
         /* 主容器 */
@@ -604,68 +616,41 @@
             }
         }
 
+        /* ========== 手機版專屬調整 ========== */
         @media (max-width: 576px) {
-            .main-title {
-                font-size: 2rem;
-            }
 
-            .typewriter {
-                font-size: 1.1rem;
-            }
-
-            .search-box {
-                flex-direction: column;
-            }
-
-            .search-select {
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-                padding-bottom: 0.5rem;
-            }
-
-            .avatar-wrapper {
-                width: 120px;
-                height: 120px;
-            }
-
-            .avatar {
-                width: 100px;
-                height: 100px;
-            }
-
-            .avatar-intro {
-                width: 90px;
-                min-height: 90px;
-            }
-
-            .intro-name {
-                font-size: 0.9rem;
-            }
-
-            .intro-desc {
-                font-size: 0.7rem;
-            }
-
-            .background-layer,
-            .background-overlay {
+            /* 外層容器：圓角 + 間距調整 */
+            .background-wrapper {
                 top: 8px;
-                left: 8px;
-                right: 8px;
+                left: 0px;
+                right: 0px;
                 bottom: 8px;
+                border-top-left-radius: 12px;
+                /* 手機版圓角調小 */
+                border-top-right-radius: 12px;
+                /* overflow: hidden 繼承自桌面版，無需重複 */
             }
 
-            .rotation-container {
-                width: 140px;
-                height: 140px;
+            /* 內層背景：加大緩衝區 + 降低視差影響 */
+            .background-layer {
+                top: -15%;
+                /* 🔑 加大負向偏移 */
+                left: -15%;
+                width: 130%;
+                /* 🔑 加大尺寸緩衝 */
+                height: 130%;
+                /* 可選：手機版稍微降低亮度避免邊緣明顯 */
+                filter: brightness(calc(var(--leleo-brightness) - 5%));
             }
+        }
 
-            .input-title {
-                font-size: 1.3rem;
-            }
-
-            .input-content {
-                font-size: 0.95rem;
-                line-height: 1.9;
+        /* 超小屏幕額外保護（可選） */
+        @media (max-width: 375px) {
+            .background-layer {
+                top: -20%;
+                left: -20%;
+                width: 140%;
+                height: 140%;
             }
         }
 
@@ -701,7 +686,9 @@
 
 <body>
     <!-- ========== 背景圖層（帶圓角和間距）========== -->
-    <div class="background-layer" id="background-layer"></div>
+    <div class="background-wrapper">
+        <div class="background-layer" id="background-layer"></div>
+    </div>
     <div class="background-overlay"></div>
 
     <div class="container">
@@ -903,8 +890,8 @@
 
         // ========== 背景圖片配置 ==========
         const BACKGROUNDS = {
-            gif1: "url('./img/ann1.gif')",
-            gif2: "url('./img/ann.gif')"
+            gif1: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann1.gif')",
+            gif2: "url('https://raw.githubusercontent.com/inulyovo/inuly-website/main/img/ann.gif')"
         };
 
         // ========== 兩組 Tags 配置 ==========
@@ -1145,14 +1132,14 @@
                 targetY = 50 + (y - 0.5) * strength;
 
             });
-
+            bgLayer.style.backgroundSize = "cover";
+            bgLayer.style.backgroundRepeat = "no-repeat";
             function animate() {
 
                 currentX += (targetX - currentX) * 0.08;
                 currentY += (targetY - currentY) * 0.08;
 
-                bgLayer.style.backgroundPosition =
-                    `${currentX}% ${currentY}%`;
+                bgLayer.style.transform = `translate(${currentX - 50}px, ${currentY - 50}px)`;
 
                 requestAnimationFrame(animate);
             }

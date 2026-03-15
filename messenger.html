@@ -16,9 +16,24 @@
 
         body {
             background: #171717;
+            overflow: hidden;
         }
 
+        .bg-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 105vh;
 
+            transform: scale(1);
+
+            background: url('./img/3.jpg') no-repeat center;
+            background-size: cover;
+
+
+            z-index: -1;
+        }
 
         .inu-sb-shell {
             position: fixed;
@@ -53,7 +68,7 @@
 
         .inu-sb-shell ul {
             position: relative;
-            height: 110vh;
+            height: 11 0vh;
         }
 
         .inu-sb-shell ul li {
@@ -145,8 +160,7 @@
             margin: 0;
             width: 100vw;
             height: 100vh;
-            background: url('./img/3.jpg') no-repeat;
-            background-size: 100% auto;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -193,6 +207,10 @@
             height: 100%;
             box-sizing: border-box;
             padding: 0 3%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
         }
 
         .container>div {
@@ -213,13 +231,38 @@
             font-weight: bold;
         }
 
-        .container>.right {
-            width: 28%;
+        .container>.left {
+            width: 520px;
         }
 
-        .container>.left {
-            height: auto;
+        .container>.right {
+            width: 520px;
         }
+
+        @media (max-width:1100px) {
+
+            .container {
+                flex-direction: column;
+                align-items: center;
+                padding-top: 4vh;
+                padding-bottom: 4vh;
+                gap: 30px;
+            }
+
+            .container>.left,
+            .container>.right {
+                width: 90%;
+                max-width: 500px;
+                height: 48%;
+            }
+
+            .inu-sb-shell {
+                display: none;
+            }
+
+        }
+
+
 
         .container>.left .item {
             margin-bottom: 25px;
@@ -261,6 +304,7 @@
             overflow-y: auto !important;
             overflow-x: hidden;
             padding-right: 5px;
+
         }
 
         /* === Webkit 滾動條樣式 === */
@@ -423,23 +467,12 @@
             }
         }
 
-
-
-        @media (min-width: 2400px) {
-            body {
-                transform: scale(1.2);
-                transform-origin: top left;
-                width: calc(100vw / 1.2);
-                height: calc(100vh / 1.2);
-                overflow-x: hidden;
-            }
-        }
     </style>
     <link rel="stylesheet" href="./css/hbnav.css">
 </head>
 
 <body>
-
+    <div class="bg-fixed"></div>
     <div class="box">
         <div class="container flexsb">
             <div class="left">
@@ -644,7 +677,7 @@
     <script src="./js/hbnav.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // === 原有留言逻辑（保持不变）===
+            initBackgroundParallax();
             const replies = [
                 "感謝您的留言！",
                 "來交個朋友？",
@@ -659,7 +692,44 @@
             ];
 
             let replyIndex = 0;
+            function initBackgroundParallax() {
 
+                const bg = document.querySelector(".bg-fixed");
+
+                let mouseX = 0;
+                let mouseY = 0;
+
+                let currentX = 0;
+                let currentY = 0;
+
+                const strength = 40;   // 視差強度
+                const smooth = 0.08;   // 慣性
+
+                document.addEventListener("mousemove", (e) => {
+
+                    mouseX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+                    mouseY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+
+                });
+
+                function animate() {
+
+                    const targetX = mouseX * strength;
+                    const targetY = mouseY * strength;
+
+                    currentX += (targetX - currentX) * smooth;
+                    currentY += (targetY - currentY) * smooth;
+
+                    bg.style.transform =
+                        `translate(calc(-5vw + ${currentX}px), calc(-5vh + ${currentY}px)) scale(1.1)`;
+
+                    requestAnimationFrame(animate);
+                }
+
+                animate();
+            }
+
+            document.addEventListener("DOMContentLoaded", initBackgroundParallax);
             function getNextReply() {
                 if (replyIndex < replies.length - 1) {
                     return replies[replyIndex++];

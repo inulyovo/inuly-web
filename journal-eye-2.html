@@ -188,12 +188,14 @@
         // ==================== 內容與設定 ====================
         // 外層文字：開發者筆記風格
         const CONTENT = `【架構說明】
-本頁面採用雙層渲染架構：外層為 DOM 元素構成的眼睛邊框，內層為 Canvas 文字動畫系統。 
-眼睛追蹤透過 getBoundingClientRect 計算座標，瞳孔位移使用三角函數與距離限制。  
-【文字動畫邏輯】
+本頁面採用雙層渲染架構：外層為 DOM 元素構成的眼睛邊框，
+內層為 Canvas 文字動畫系統。眼睛追蹤透過 
+getBoundingClientRect計算座標，
+瞳孔位移使用三角函數與距離限制。                 
+【文字動畫邏輯】    
 每個字元獨立計算與滑鼠的距離，450px 內產生排斥效果，超出則自動歸位。
 背景於字元位移超過閾值時浮現，形成表裡雙重敘事。
-【設計靈感】
+【設計靈感】           
 底層文字意象取自魯迅《狂人日記》——從字縫中看出隱藏的真相。
 內層內容範圍受外層邊框約束，象徵框架之內的自我表述。`;
 
@@ -205,7 +207,6 @@
 文字試圖逃離原位，終究被拉回既定軌道。
                             
 白色文字是當下的表述，紅色是歷史的迴聲。
-
 當表層被擾動，底層的真相才會浮現。
 
 內層的自述永遠無法超越外層的框架，
@@ -311,11 +312,11 @@
 
             #initTextPos() {
                 const config = {
-                    marginLeft: 150,
-                    marginRight: 150,
-                    marginTop: 100,
+                    marginLeft: 180,
+                    marginRight: 180,
+                    marginTop: 200,
                     marginBottom: 100,
-                    lineHeight: 61 * this.ratio,
+                    lineHeight: 69 * this.ratio,
                 };
 
                 const textWidth = this.cWidth - config.marginLeft - config.marginRight;

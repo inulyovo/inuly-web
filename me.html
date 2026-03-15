@@ -1178,37 +1178,37 @@
         });
 
         function initBackgroundParallax() {
-
             const bgLayer = document.getElementById("background-layer");
+
+            // 🔹 手機版禁用視差效果
+            if (window.innerWidth <= 768) {
+                bgLayer.style.transform = 'none';
+                bgLayer.style.willChange = 'auto';
+                return;  // 直接返回，不執行視差
+            }
 
             let targetX = 50;
             let targetY = 50;
             let currentX = 50;
             let currentY = 50;
-
-            const strength = 30; // 視差強度 (建議20~40)
+            const strength = 30;
 
             document.addEventListener("mousemove", (e) => {
-
                 const x = e.clientX / window.innerWidth;
                 const y = e.clientY / window.innerHeight;
-
                 targetX = 50 + (x - 0.5) * strength;
                 targetY = 50 + (y - 0.5) * strength;
-
             });
+
             bgLayer.style.backgroundSize = "cover";
             bgLayer.style.backgroundRepeat = "no-repeat";
-            function animate() {
 
+            function animate() {
                 currentX += (targetX - currentX) * 0.08;
                 currentY += (targetY - currentY) * 0.08;
-
                 bgLayer.style.transform = `translate(${currentX - 50}px, ${currentY - 50}px)`;
-
                 requestAnimationFrame(animate);
             }
-
             animate();
         }
     </script>

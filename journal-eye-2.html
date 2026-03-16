@@ -193,9 +193,10 @@
 getBoundingClientRect計算座標，
 瞳孔位移使用三角函數與距離限制。                 
 【文字動畫邏輯】    
-每個字元獨立計算與滑鼠的距離，450px 內產生排斥效果，超出則自動歸位。
+每個字元獨立計算與滑鼠的距離，450px         
+內產生排斥效果，超出則自動歸位。           
 背景於字元位移超過閾值時浮現，形成表裡雙重敘事。
-【設計靈感】           
+【設計靈感】                  
 底層文字意象取自魯迅《狂人日記》——從字縫中看出隱藏的真相。
 內層內容範圍受外層邊框約束，象徵框架之內的自我表述。`;
 
@@ -311,12 +312,20 @@ getBoundingClientRect計算座標，
             }
 
             #initTextPos() {
-                const config = {
-                    marginLeft: 180,
-                    marginRight: 180,
-                    marginTop: 200,
+                const baseConfig = {
+                    marginLeft: 100,
+                    marginRight: 100,
+                    marginTop: 100,
                     marginBottom: 100,
-                    lineHeight: 69 * this.ratio,
+                    lineHeight: 61,
+                };
+
+                const config = {
+                    marginLeft: baseConfig.marginLeft * this.ratio,
+                    marginRight: baseConfig.marginRight * this.ratio,
+                    marginTop: baseConfig.marginTop * this.ratio,
+                    marginBottom: baseConfig.marginBottom * this.ratio,
+                    lineHeight: baseConfig.lineHeight * this.ratio,
                 };
 
                 const textWidth = this.cWidth - config.marginLeft - config.marginRight;

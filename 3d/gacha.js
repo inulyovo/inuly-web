@@ -549,22 +549,28 @@ function initDrawFeature() {
 
                     // 關鍵新增：抽完後快速按兩次R的效果
                     setTimeout(() => {
-                        const uprightPanel = document.querySelector('.upright-panel');
-                        const reversedPanel = document.querySelector('.reversed-panel');
+                        // 第一次按R
+                        const rEvent1 = new KeyboardEvent('keydown', {
+                            key: 'r',
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        document.dispatchEvent(rEvent1);
 
-                        // 先移除兩個面板的 active
-                        if (uprightPanel) uprightPanel.classList.remove('active');
-                        if (reversedPanel) reversedPanel.classList.remove('active');
+                        // 100毫秒後第二次按R
+                        setTimeout(() => {
+                            const rEvent2 = new KeyboardEvent('keydown', {
+                                key: 'r',
+                                bubbles: true,
+                                cancelable: true
+                            });
+                            document.dispatchEvent(rEvent2);
 
-                        // 根據正逆位設置對應面板
-                        if (isUpright) {
-                            if (uprightPanel) uprightPanel.classList.add('active');
-                        } else {
-                            if (reversedPanel) reversedPanel.classList.add('active');
-                        }
-
-                        // 顯示指示器
-                        showOrientationIndicator(isUpright ? 'upright' : 'reversed');
+                            // 顯示指示器
+                            setTimeout(() => {
+                                showOrientationIndicator(isUpright ? 'upright' : 'reversed');
+                            }, 200);
+                        }, 100);
                     }, 500);
                 }, 100);
             };

@@ -14,6 +14,10 @@
     /* 確保能接收點擊事件 */
 }
 
+#lightbox-overlay.active {
+    pointer-events: auto;
+}
+
 .lightbox-container {
     position: relative;
     display: flex;
@@ -326,10 +330,21 @@
         /* 關鍵：所有內容靠左對齊 */
         justify-content: flex-start;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        /* 改善移動端滾動 */
+        pointer-events: none !important;
         overflow-x: hidden;
         padding: 20px 15px 100px 15px;
         cursor: default;
         height: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #lightbox-img,
+    #rotate-button,
+    .upright-panel,
+    .reversed-panel {
+        pointer-events: auto !important;
     }
 
     /* 2. 圖片容器 */
@@ -344,6 +359,8 @@
         transform: none !important;
         display: block;
         z-index: 1000;
+        pointer-events: auto;
+        /* 🔑 確保圖片可點擊 */
     }
 
     /* 3. 文字容器 - 關鍵修改 */
@@ -366,7 +383,9 @@
         align-items: center;
         /* 面板靠左 */
         z-index: 2001;
-        pointer-events: auto;
+
+        pointer-events: none !important;
+        /* 🔑 改為 none，讓點擊穿透到 overlay */
     }
 
     /* 4. 面板樣式 (正位/逆位) */
@@ -398,6 +417,8 @@
         border: 1px solid rgba(70, 50, 100, 0.7);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(8px);
+        pointer-events: auto;
+        /* 🔑 面板本身可點擊 */
     }
 
     /* 顯示 active 的面板 */
@@ -415,6 +436,8 @@
         bottom: 20px;
         right: 20px;
         z-index: 3000;
+        pointer-events: auto;
+        /* 🔑 確保按鈕可點擊 */
     }
 
     #orientation-indicator {
@@ -427,7 +450,27 @@
     #keyboard-hint {
         display: none;
     }
+
+    /* 🔑 新增：確保點擊區域光標在響應式下也生效 */
+    #lightbox-overlay.lightbox-prev-area {
+        cursor: w-resize !important;
+    }
+
+    #lightbox-overlay.lightbox-next-area {
+        cursor: e-resize !important;
+    }
+
+    .shell .button {
+        top: 83vh
+    }
+
+    .shell #tarot-draw-button {
+        top: 6vh
+    }
+
 }
+
+
 
 /* 更小螢幕微調 */
 @media (max-width: 480px) {

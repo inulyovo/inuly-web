@@ -145,7 +145,7 @@
     /* 🔑 主導航：保留原始 transform，只調整尺寸 */
     .hbnav-nav {
         /* ❌ 不要覆蓋 transform！讓原始 CSS 的 scale(0.6) + GSAP 動畫正常運作 */
-        width: 760px !important;
+        width: 560px !important;
         /* 縮小容器寬度 */
         height: 120px !important;
         /* 稍微降低高度 */
@@ -158,7 +158,7 @@
     /* 🔑 導航項目：縮小寬度 */
     .hbnav-nav-item,
     .hbnav-nav a.hbnav-nav-item {
-        width: 110px !important;
+        width: 85px !important;
         /* 原 160px → 110px */
     }
 
@@ -223,11 +223,11 @@
 }
 
 /* 超小屏幕 (≤375px) */
-@media (max-width: 375px) {
+/* @media (max-width: 375px) {
     .hbnav-nav {
-        width: 800px !important;
+        width: 600px !important;
         height: 110px !important;
-        padding: 0 40px !important;
+        padding: 0 30px !important;
     }
 
     .hbnav-nav-item,
@@ -259,7 +259,7 @@
         height: 30px !important;
         bottom: 10px !important;
     }
-}
+} */
 
 /* 橫屏手機 - 隱藏文字只留圖標 */
 @media (max-height: 500px) and (orientation: landscape) {

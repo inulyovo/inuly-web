@@ -466,7 +466,6 @@
                 transform-origin: left center;
             }
         }
-
     </style>
     <link rel="stylesheet" href="./css/hbnav.css">
 </head>
@@ -483,6 +482,7 @@
                 <div class="item yining">
                     <textarea placeholder="請輸入留言內容" class="text"></textarea>
                 </div>
+
                 <div class="btn flexsb">
                     <button class="yining clear bg">清空</button>
                     <button class="yining OK bg">提交</button>
@@ -528,10 +528,13 @@
                         </div>
                         <span>發布於 2026/01/16 16:11:56</span>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+
+
     <nav class="hbnav-nav" id="hbnav-nav">
         <a href="./test3.html" class="hbnav-nav-item" data-vertical-transition>
             <span class="hbnav-icon">
@@ -678,20 +681,79 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initBackgroundParallax();
-            const replies = [
-                "感謝您的留言！",
-                "來交個朋友？",
-                "還是今天是來談場合作？",
-                "聯繫我，或者我聯繫你 (∠・ω< )⌒★",
-                "要不我們去喝個三色豆奶茶？",
-                "你真的好會聊天歐",
-                "你再留言我就要帶你去古戰場了！",
-                "警告：你的祖先沒有對留言板發癲！",
-                "你是不是以為我是 Siri？",
-                "伺服器繁忙中，請稍後嘗試。"
-            ];
+            function initMessageList() {
+                const list = document.querySelector('.list');
 
-            let replyIndex = 0;
+                // 1. 先保留原有的兩個 ASCII 留言（HTML 裡已經寫死）
+                // 2. 再從 API 載入新留言附加在後面
+                loadMessages();
+            }
+
+            // 從 API 載入新留言
+            async function loadMessages() {
+                try {
+                    const response = await fetch('/api/messages/GET.js');
+                    const data = await response.json();
+
+                    if (!data.success || !data.messages) return;
+
+                    const list = document.querySelector('.list');
+                    const existingIds = new Set();
+
+                    list.querySelectorAll('.api-message').forEach(el => {
+                        existingIds.add(el.dataset.id);
+                    });
+
+                    const newMessages = data.messages.filter(msg => !existingIds.has(msg.id));
+
+                    newMessages.forEach(msg => {
+                        const item = document.createElement('div');
+                        item.className = 'item yining bg api-message';
+                        item.dataset.id = msg.id;
+
+                        const displayUser = msg.username || msg.user?.username || '未知用戶';
+                        const avatarSrc = msg.avatar || './img/5.jpg';  // ✅ 使用儲存的頭像
+
+                        item.innerHTML = `
+                <div class="top">
+                    <img src="${avatarSrc}" alt="" onerror="this.src='./img/5.jpg'">
+                    <div>${escapeHtml(displayUser)}</div>
+                </div>
+                <div class="content">${escapeHtml(msg.content)}</div>
+                <span>發布於 ${formatTime(msg.created_at)}</span>
+            `;
+                        list.appendChild(item);
+                    });
+                } catch (err) {
+                    console.error('載入留言失敗:', err);
+                }
+            }
+
+            // 格式化時間
+            function formatTime(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleString('zh-TW', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+
+            // HTML 轉義防止 XSS
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // 頁面載入時執行
+
+            initMessageList();
+
+            // 每 30 秒自動刷新新留言（可選）
+            setInterval(loadMessages, 30000);
+
+
+
             function initBackgroundParallax() {
 
                 const bg = document.querySelector(".bg-fixed");
@@ -729,61 +791,83 @@
                 animate();
             }
 
-            document.addEventListener("DOMContentLoaded", initBackgroundParallax);
-            function getNextReply() {
-                if (replyIndex < replies.length - 1) {
-                    return replies[replyIndex++];
-                } else {
-                    replyIndex = replies.length - 1;
-                    return replies[replyIndex];
-                }
-            }
+
+
 
             function clearTextOnly() {
                 document.querySelector('.text').value = "";
             }
 
-            document.querySelector('.OK').onclick = function () {
-                const name = document.querySelector('.name').value.trim();
+            document.querySelector('.OK').onclick = async function () {
+                const nameInput = document.querySelector('.name').value.trim();
                 const text = document.querySelector('.text').value.trim();
-                const now = new Date().toLocaleString();
+                const token = localStorage.getItem('token');
 
-                if (name === "" || text === "") {
-                    alert("輸入欄不能為空！");
+                // 🔐 檢查是否登入
+                if (!token) {
+                    const confirmLogin = confirm('⚠️ 留言需要登入\n\n是否前往登入頁面？');
+                    if (confirmLogin) {
+                        window.location.href = './_login.html';
+                    }
                     return;
                 }
 
-                const list = document.querySelector('.list');
+                // 🔍 檢查是否為訪客用戶
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.isGuest) {
+                        const confirmLogin = confirm('⚠️ 訪客模式無法留言\n\n請登入或註冊帳號');
+                        if (confirmLogin) {
+                            window.location.href = './_login.html';
+                        }
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Token 解析失敗:', err);
+                    alert('登入狀態異常，請重新登入');
+                    localStorage.removeItem('token');
+                    return;
+                }
 
-                list.innerHTML += `
-            <div class="item yining bg">
-                <div class="top">
-                    <img src="./img/5.jpg" alt="">
-                    <div>${name}</div>
-                </div>
-                <div class="content">${text}</div>
-                <span>發布於 ${now}</span>
-            </div>
-        `;
+                // ✅ 驗證輸入
+                if (text === "") {
+                    alert("留言內容不能為空！");
+                    return;
+                }
 
-                const replyText = getNextReply();
-                const replyTime = new Date(Date.now() + 1000).toLocaleString();
+                // 🎲 隨機選擇頭像（從 1.jpg 到 23.jpg）
+                const randomNum = Math.floor(Math.random() * 23) + 1;
+                const avatarPath = `./img/${randomNum}.jpg`;
 
-                list.innerHTML += `
-            <div class="item reply yining">
-                <div class="top">
-                    <img src="./img/16.jpg" alt="">
-                    <div>系統</div>
-                </div>
-                <div class="content">${replyText}</div>
-                <span>發布於 ${replyTime}</span>
-            </div>
-        `;
+                try {
+                    const response = await fetch('/api/messages/POST.js', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({
+                            content: text,
+                            displayName: nameInput || undefined,
+                            avatar: avatarPath  // ✅ 發送隨機頭像路徑
+                        })
+                    });
 
-                clearTextOnly();
-                list.scrollTop = list.scrollHeight;
+                    const data = await response.json();
+
+                    if (data.success) {
+                        document.querySelector('.text').value = '';
+                        loadMessages();
+                        const list = document.querySelector('.list');
+                        list.scrollTop = list.scrollHeight;
+                    } else {
+                        alert('❌ ' + (data.error || '留言失敗'));
+                    }
+                } catch (err) {
+                    console.error('留言錯誤:', err);
+                    alert('❌ 網絡錯誤，請稍後重試');
+                }
             };
-
             document.querySelector('.clear').onclick = clearTextOnly;
 
             // === 避让动画逻辑（修正版）===

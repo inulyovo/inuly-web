@@ -195,7 +195,7 @@ body.show-password .logbody .sub:hover {
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
-
+    text-decoration: none !important;
     display: block;
 
 }
@@ -286,6 +286,16 @@ body.show-password .eye {
     opacity: 0;
 }
 
+.form-footer a {
+    text-decoration: none !important;
+    border: none !important;
+    outline: none !important;
+    display: inline-block;
+    /* 或 block */
+    line-height: 0;
+    /* 防止底線殘留 */
+}
+
 body.show-password #beam {
     opacity: 1;
     background: rgba(255, 255, 180, 0.8);
@@ -318,9 +328,23 @@ body.show-password #beam {
         margin-left: 5%;
     }
 
+    /* 強制修復 a 標籤包裹 input 的問題 */
+    .form-footer a {
+        display: block;
+        width: 90%;
+        margin: 10px auto 0;
+        text-decoration: none !important;
+
+    }
+
+    #toggleLogin {
+        margin-left: 0 !important;
+        /* 覆蓋負 margin */
+    }
+
     .ykbt {
-        margin-left: auto;
-        margin-right: auto;
+        margin-left: auto !important;
+        margin-right: auto !important;
         display: block;
         width: 90%;
         margin-top: 10px;

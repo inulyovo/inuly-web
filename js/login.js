@@ -135,7 +135,7 @@ async function login() {
         const result = await response.json();
 
         if (response.ok && result.success) {
-            // 登入成功：儲存使用者資訊
+            localStorage.setItem('token', result.token);
             localStorage.setItem('user', JSON.stringify(result.user));
 
             // ✅ 移除 alert，直接跳轉
@@ -183,6 +183,7 @@ async function guestLogin() {
         console.log('📥 Response data:', result);
 
         if (response.ok && result.success) {
+            localStorage.setItem('token', result.token);
             localStorage.setItem('user', JSON.stringify(result.user));
             console.log('✅ Guest login successful, redirecting...');
             window.location.href = './me.html';

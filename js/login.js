@@ -138,12 +138,9 @@ async function login() {
             // 登入成功：儲存使用者資訊
             localStorage.setItem('user', JSON.stringify(result.user));
 
-            showFeedback('登入成功！', 'success');
+            // ✅ 移除 alert，直接跳轉
+            window.location.href = './me.html';
 
-            // 1 秒後跳轉
-            setTimeout(() => {
-                window.location.href = './me.html';
-            }, 1000);
             return true;
         } else {
             showFeedback(result.error || '帳號或密碼錯誤', 'error');

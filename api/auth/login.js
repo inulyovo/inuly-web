@@ -1,3 +1,4 @@
+// /api/auth/login.js
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -6,21 +7,19 @@ export const config = {
   runtime: 'nodejs',
 };
 
-export default async function handler(req) {
+export default async function handler(req, res) {  // ✅ 加上 res 參數
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: '方法不允許' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ error: '方法不允許' });  // ✅ 用 res.json()
   }
 
   try {
-    const { username, password } = await req.json();
+    // ✅ 修正：Node.js runtime 直接用 req.body（Vercel 會自動解析 JSON）
+    const { username, password } = req.body;
 
     if (!username || !password) {
-      return new Response(JSON.stringify({ error: '請輸入帳號與密碼' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
+      return res.status(400).json({ 
+        success: false,  // ✅ 加上 success 欄位匹配前端
+        error: '請輸入帳號與密碼' 
       });
     }
 
@@ -30,25 +29,25 @@ export default async function handler(req) {
     );
 
     // 查詢使用者
-    const { data: user, error } = await supabase
+    const { data: user, error: queryError } = await supabase
       .from('users')
       .select('id, username, password_hash, email')
       .eq('username', username)
-      .single();
+      .maybeSingle();  // ✅ 用 maybeSingle() 避免找不到時拋錯
 
-    if (error || !user) {
-      return new Response(JSON.stringify({ error: '帳號或密碼錯誤' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
+    if (queryError || !user) {
+      return res.status(401).json({ 
+        success: false,
+        error: '帳號或密碼錯誤' 
       });
     }
 
     // 驗證密碼
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
-      return new Response(JSON.stringify({ error: '帳號或密碼錯誤' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
+      return res.status(401).json({ 
+        success: false,
+        error: '帳號或密碼錯誤' 
       });
     }
 
@@ -68,17 +67,12 @@ export default async function handler(req) {
     // 回傳 token 與使用者資訊 (不包含密碼)
     const { password_hash, ...userInfo } = user;
 
-    return new Response(JSON.stringify({
-      success: true,
+    // ✅ 修正：用 res 回傳，加上 success: true
+    return res.status(200).json({
+      success: true,  // ✅ 前端需要這個欄位
       message: '登入成功',
       token,
       user: userInfo
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': `auth_token=${token}; Path=/; Max-Age=604800; HttpOnly; SameSite=Lax`
-      }
     });
 
   } catch (err) {
@@ -88,20 +82,10 @@ export default async function handler(req) {
       name: err.name
     });
 
-    // 開發環境回傳詳細錯誤（上線時請移除）
-    if (process.env.NODE_ENV === 'development') {
-      return new Response(JSON.stringify({
-        error: '伺服器錯誤',
-        debug: err.message
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    return new Response(JSON.stringify({ error: '伺服器錯誤' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    // ✅ 失敗回應也要加上 success: false
+    return res.status(500).json({ 
+      success: false,
+      error: process.env.NODE_ENV === 'development' ? err.message : '伺服器錯誤' 
     });
   }
 }

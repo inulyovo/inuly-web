@@ -139,36 +139,23 @@
             transform: translateX(0);
         }
 
-        /* ===== 底部按鈕樣式 ===== */
+
+
+        /* 再次確認父層設定，確保它們被置中 */
         .form-footer {
             display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: center;
+            /* 讓兩個按鈕置中 */
+            align-items: center;
+            gap: 30px;
+            /* 兩個按鈕中間的距離 */
+            margin-top: 40px;
+            /* 與上方「登入」大按鈕的距離 */
+            width: 100%;
         }
 
-        .ykbt {
-            padding: 10px 20px;
-            font-size: 14px;
-            background: rgba(102, 126, 234, 0.2);
-            border: 1px solid rgba(102, 126, 234, 0.5);
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
 
-        .ykbt:hover {
-            background: rgba(102, 126, 234, 0.4);
-            transform: translateY(-2px);
-        }
 
-        /* 註冊表單底部按鈕置中 */
-        #registerForm .ykbt {
-            display: block;
-            margin: 15px auto 0;
-        }
 
         #beam,
         #beamReg {
@@ -177,6 +164,11 @@
 
         #beamReg {
             transform: rotate(var(--beamDegreesReg));
+        }
+
+        #toggleLogin {
+            margin-left: -20px;
+            /* 負值會讓它往左移 */
         }
     </style>
 </head>
@@ -228,7 +220,7 @@
                 <!-- 底部按鈕 -->
                 <div class="form-footer">
                     <a href="./me.html"><input type="button" value="訪客登入" id="ykbt" class="ykbt"></a>
-                    <input type="button" value="↻ 帳號註冊" id="toggleRegister" class="ykbt">
+                    <input type="button" value="帳號註冊" id="toggleRegister" class="ykbt">
                 </div>
             </form>
 
@@ -257,7 +249,7 @@
                 <input type="submit" value="註冊" id="regSub" class="sub">
 
                 <!-- 返回按鈕 -->
-                <input type="button" value="↩ 返回登入" id="toggleLogin" class="ykbt">
+                <input type="button" value="返回登入" id="toggleLogin" class="ykbt">
             </form>
         </div>
     </div>
@@ -494,8 +486,8 @@
                 });
             }
 
-            
-            
+
+
 
             // ===== 註冊表單的眼睛按鈕（統一控制兩欄）=====
             const eyeballReg = document.getElementById('eyeballReg');

@@ -83,6 +83,7 @@ body.show-password .back::before {
     align-items: center;
     min-width: 625px;
     min-height: 375px;
+
     background-color: rgba(50, 59, 88, 0.7);
     overflow: hidden;
     border-radius: 10px;
@@ -182,13 +183,21 @@ body.show-password .logbody .sub:hover {
 }
 
 .ykbt {
-    margin-top: 20px;
-    margin-left: 125%;
+    margin: 10px;
+    /* 移除 padding-right: 50px，或改為合理值 */
+    padding: 5px 2vw;
+    /* 上下 5px，左右 15px 即可 */
+
     border: none;
     background-color: transparent;
     color: rgb(180, 216, 233);
-    font-size: 16px;
+    font-size: 14px;
+    font-family: inherit;
     cursor: pointer;
+    white-space: nowrap;
+
+    display: block;
+
 }
 
 body.show-password .ykbt {
